@@ -6,12 +6,12 @@
 #define DIGITP_H
 
 typedef struct _XdDigitClassPart{
-       int ignore;
+	int ignore;
 } XdDigitClassPart ;
 
 typedef struct _XdDigitClassRec{
-   CoreClassPart         core_class;
-   XdDigitClassPart      digit_class;
+	CoreClassPart         core_class;
+	XdDigitClassPart      digit_class;
 } XdDigitClassRec;
 
 extern XdDigitClassRec XddigitClassRec;
@@ -28,8 +28,8 @@ typedef struct _XdDigitPart {
 } XdDigitPart;
 
 typedef struct _XdDigitRec {
-   CorePart          core;
-   XdDigitPart       digit;
+	CorePart          core;
+	XdDigitPart       digit;
 } XdDigitRec;
 
 /*
