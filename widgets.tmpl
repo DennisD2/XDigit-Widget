@@ -5,10 +5,10 @@
  *
  */
 
-CC=gcc
-CFLAGS += -std=c17
-CDEBUGFLAGS=-g
-SYS_LIBRARIES = -lXext -lXm -lXmu -lXt -lX11 -lm
+CC              =   gcc
+CFLAGS          +=  -std=c17
+CDEBUGFLAGS     =   -g
+SYS_LIBRARIES   =   -lXt $(XLIB)
 
 .SUFFIXES:      .cc .C .c .exe
 
