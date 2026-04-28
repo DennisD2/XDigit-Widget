@@ -10,13 +10,15 @@ LDOPTIONS       = -L.
 #DEPLIBS         = $(DEPXLIB)
 SYS_LIBRARIES   += -lWidgets
 
-PROGRAM       	= libWidgets.a xdigit
+PROGRAM       	= libWidgets.a xdigit multi-zone-clock
 
 SRCS	      	= Digit.c 
 SRCS1 		    = xdigit.c
+SRCS2 		    = multi-zone-clock.c
 
 OBJS          	= Digit.o
 OBJS1 		    = xdigit.o
+OBJS2 		    = multi-zone-clock.o
 
 PROGRAMS        = $(PROGRAM)
 
@@ -25,6 +27,8 @@ all:: install $(PROGRAMS)
 NormalLibraryTarget(Widgets,$(OBJS))
 
 NormalProgramTarget(xdigit,$(OBJS1),,$(LOCAL_LIBRARIES),)
+
+NormalProgramTarget(multi-zone-clock,$(OBJS2),,$(LOCAL_LIBRARIES),)
 
 #MakeDistTarget($(SRCS) $(SRCS1) widgets.tmpl Imakefile)
 
