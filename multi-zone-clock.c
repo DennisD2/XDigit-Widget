@@ -107,12 +107,10 @@ int main(int argc, char **argv) {
 	}
     XtRealizeWidget(toplevel);
 
-    /* init clock display */
-
-    
-    /* add time out */
-	for ( i=0; i<NUM_CLOCKS; i++ ) {
+    for ( i=0; i<NUM_CLOCKS; i++ ) {
+    	/* init clock display */
 		TimeoutCB( (XtPointer)digit[i], NULL );
+    	/* add time out */
 		XtAddTimeOut( TIMEOUT, TimeoutCB, digit[i] );
 	}
     XtMainLoop();
