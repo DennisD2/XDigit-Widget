@@ -1,17 +1,16 @@
 
-#include <MME.tmpl>
+#include <widgets.tmpl>
 
-#
 CCOPTIONS       =-Wall
-INCLUDES        +=
+#INCLUDES        +=
 
 LDOPTIONS       = -L.
-LOCAL_LIBRARIES = 
-  EXTRA_DEFINES = 
-        DEPLIBS = $(DEPXLIB)
-SYS_LIBRARIES   = -lVideo -lXt $(XLIB) -lc 
+#LOCAL_LIBRARIES =
+#  EXTRA_DEFINES =
+#DEPLIBS         = $(DEPXLIB)
+SYS_LIBRARIES   = -lWidgets -lXt $(XLIB) -lc
 
-PROGRAM       	= libVideo.a xdigit
+PROGRAM       	= libWidgets.a xdigit
 
 SRCS	      	= Digit.c 
 SRCS3 		    = xdigit.c
@@ -23,7 +22,7 @@ PROGRAMS        = $(PROGRAM)
 
 all:: install $(PROGRAMS)
 
-NormalLibraryTarget(Video,$(OBJS))
+NormalLibraryTarget(Widgets,$(OBJS))
 
 NormalProgramTarget(xdigit,$(OBJS3),,$(LOCAL_LIBRARIES),)
 
