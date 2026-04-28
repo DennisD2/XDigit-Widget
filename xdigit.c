@@ -12,8 +12,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void TimeoutCB( XtPointer client_data, XtIntervalId* id )
-{
+void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	Widget *digit = (Widget *)client_data;
 	Arg args[1]; 
 	time_t t;
@@ -54,11 +53,10 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id )
 	/*
 	 * start time out from the beginning 
 	 */
-        XtAddTimeOut( TIMEOUT, TimeoutCB, digit );
+	XtAddTimeOut( TIMEOUT, TimeoutCB, digit );
 }
 
-int main(int argc, char **argv)
-  {
+int main(int argc, char **argv) {
     Widget toplevel, compo, digit[5];
     Arg args[8]; int n, i;
 
@@ -83,10 +81,12 @@ int main(int argc, char **argv)
     	n=0;
     	XtSetArg( args[n], XtNx, (Position)i*60 ); n++;
     	XtSetArg( args[n], XtNy, (Position)0 ); n++;
-	XtSetArg( args[n], XtNwidth, (Dimension)60 ); n++;
-	if (i==2 ) XtSetArg( args[n], XtNvalue, DOUBLEPOINT_VALUE ); 
-	 else XtSetArg( args[n], XtNvalue, i ); 
-	n++;
+		XtSetArg( args[n], XtNwidth, (Dimension)60 ); n++;
+		if (i==2 )
+			XtSetArg( args[n], XtNvalue, DOUBLEPOINT_VALUE );
+		else
+			XtSetArg( args[n], XtNvalue, i );
+		n++;
     	digit[i] = XtCreateManagedWidget("digit", XddigitWidgetClass, 
                                  compo, args, n);
     }
