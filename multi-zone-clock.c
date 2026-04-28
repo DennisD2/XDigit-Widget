@@ -14,21 +14,21 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void setClocksValue(Widget *digit, char *values[4]) {
+void setClocksValue(Widget *digit[5], char *values[4]) {
 	Arg args[1];
 
 	XtSetArg(args[0], XtNvalue, atoi(values[0]));
-	XtSetValues( digit[0], args, 1 );
-	XtSetArg( args[0], XtNvalue, atoi(values[1]) );
-	XtSetValues( digit[1], args, 1 );
+	XtSetValues( *digit[0], args, 1 );
+	XtSetArg(args[0], XtNvalue, atoi(values[1]));
+	XtSetValues( *digit[1], args, 1 );
 	XtSetArg( args[0], XtNvalue, atoi(values[2]) );
-	XtSetValues( digit[3], args, 1 );
+	XtSetValues( *digit[3], args, 1 );
 	XtSetArg( args[0], XtNvalue, atoi(values[3]) );
-	XtSetValues( digit[4], args, 1 );
+	XtSetValues( *digit[4], args, 1 );
 }
 
 void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
-	Widget *digit = (Widget *)client_data;
+	Widget **digit = (Widget**)client_data;
 	time_t t;
 	char *buf, *p, *values[4];
 	int i;
@@ -38,7 +38,7 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	   values[i][0] = '0'; values[i][1]='\0';
 	}
 
-        /*
+    /*
 	 * Get time and convert to values suitable for the Digit widgets
 	 */
 	time( &t );
@@ -55,6 +55,7 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	/*
 	 * set value-resource of the digits
 	 */
+
 	setClocksValue(digit, values);
 
 	/*
@@ -107,13 +108,11 @@ int main(int argc, char **argv) {
 	}
     XtRealizeWidget(toplevel);
 
-    for ( i=0; i<NUM_CLOCKS; i++ ) {
-    	/* init clock display */
-		TimeoutCB( (XtPointer)digit[i], NULL );
-    	/* add time out */
-		XtAddTimeOut( TIMEOUT, TimeoutCB, digit[i] );
-	}
+    /* init clock display */
+	TimeoutCB( (XtPointer)digit, NULL );
+
+	/* add time out */
+	//XtAddTimeOut( TIMEOUT, TimeoutCB, digit[i] );
+
     XtMainLoop();
 }
-
-
