@@ -17,8 +17,7 @@ typedef struct _XdDigitRec      * XdDigitWidget;
 
 #define XtCDelta		"Delta"
 
-extern Widget XtCreateDigit( Widget parent, char *name, ArgList args,
-        int ArgCount );
+extern Widget XtCreateDigit( Widget parent, char *name, ArgList args, int ArgCount );
 
 /*
  * special values 
