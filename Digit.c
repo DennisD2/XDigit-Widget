@@ -1,5 +1,5 @@
 /*
- *
+ * The Digit Widget
  *
  * 
  */
@@ -47,7 +47,6 @@ static XtResource resources[] = {
   {XtNforeground, XtCForeground, XtRPixel, sizeof (Pixel),
    XtOffset(XdDigitWidget, digit.foreground), 
    XtRString, "Black"                                    },
-
 };
 
 XdDigitClassRec  XddigitClassRec = {
@@ -102,9 +101,7 @@ WidgetClass XddigitWidgetClass = (WidgetClass) &XddigitClassRec;
 /* unique value */
 #define NUM_UNKNOWN -99
 
-static void Initialize (request, new)
-  XdDigitWidget request, new;
-{
+static void Initialize (XdDigitWidget request, XdDigitWidget new) {
   XGCValues values;
   XtGCMask  valueMask;
 
@@ -135,34 +132,28 @@ static void Initialize (request, new)
   values.fill_style = FillSolid;
   new->digit.segment_GC = XtGetGC ( (Widget)new, valueMask, &values);  
   Resize (new);
-
 }
 
-static void Destroy (w)
-  XdDigitWidget w;
-{
+static void Destroy (XdDigitWidget w) {
   XtDestroyGC (w->digit.segment_GC);
 }
 
-static void Resize (w)
-     XdDigitWidget w;
-{
+static void Resize (XdDigitWidget w) {
   /*
    * recalculate height, width and delta for a segment 
    */
   w->digit.segment_height = 10*w->core.height/25;
-  if (w->digit.segment_height == 0) w->digit.segment_height=1;
+  if (w->digit.segment_height == 0)
+    w->digit.segment_height=1;
   w->digit.segment_width = w->digit.segment_height/5;
-  if (w->digit.segment_width == 0) w->digit.segment_width=1;
+  if (w->digit.segment_width == 0)
+    w->digit.segment_width=1;
   w->digit.segment_delta = w->digit.segment_width/2;
-  if (w->digit.segment_delta == 0) w->digit.segment_delta = 1;
+  if (w->digit.segment_delta == 0)
+    w->digit.segment_delta = 1;
 }
 
-static void Redisplay (w, event, region)
-  XdDigitWidget  w;
-  XEvent       *event;
-  Region        region;
-{
+static void Redisplay (XdDigitWidget w, XEvent *event, Region region) {
   if(w->core.visible){
     /*
      * Set the clip masks in all graphics contexts.
@@ -173,9 +164,7 @@ static void Redisplay (w, event, region)
   }
 }
 
-static Boolean SetValues (current, request, new)
-  XdDigitWidget current, request, new;
-{
+static Boolean SetValues (XdDigitWidget current, XdDigitWidget request, XdDigitWidget new) {
 	XGCValues  values;
 	XtGCMask   valueMask;
 	Boolean    redraw = FALSE;
@@ -213,10 +202,7 @@ static Boolean SetValues (current, request, new)
   return redraw ;
 }
 
-static void DrawValue(  w, new, old )
-  XdDigitWidget w;
-  int new, old;
-{ 
+static void DrawValue(  XdDigitWidget w, int new, int old ) {
   int i, s[11] ;
 
   for (i=1;i<11;i++)
@@ -245,8 +231,7 @@ static void DrawValue(  w, new, old )
       DrawSegment(w,8);
 }
 
-static void DrawSegment( XdDigitWidget w, int id )
-{
+static void DrawSegment( XdDigitWidget w, int id ){
   int sw = w->digit.segment_width, sh = w->digit.segment_height;
   int dir = DIR_VERTICAL;
   int x=0,y=0;
@@ -269,8 +254,7 @@ static void DrawSegment( XdDigitWidget w, int id )
     _drawSegment(w, x, y, dir );
 }
 
-static void _drawSegment( XdDigitWidget w, int ox, int oy, int dir ) 
-{
+static void _drawSegment( XdDigitWidget w, int ox, int oy, int dir ) {
   XPoint p[6];
   int sm = w->digit.segment_margin ;
   int sw = w->digit.segment_width ;
@@ -296,10 +280,7 @@ static void _drawSegment( XdDigitWidget w, int ox, int oy, int dir )
     w->digit.segment_GC, p, 6, Convex, CoordModePrevious );
 }
 
-static void _drawDecimalPoint( w, ox, oy ) 
-  XdDigitWidget w;
-  int ox, oy;
-{
+static void _drawDecimalPoint( XdDigitWidget w, int ox, int oy ) {
   int x,y,ww,h;
   int sm = w->digit.segment_margin ;
   int sw = w->digit.segment_width ;

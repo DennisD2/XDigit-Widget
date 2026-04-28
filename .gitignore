@@ -1,0 +1,5 @@
+dial
+*.o
+*.a
+/.idea
+*.bak
