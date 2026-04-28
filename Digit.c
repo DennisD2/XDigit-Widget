@@ -205,8 +205,9 @@ static Boolean SetValues (XdDigitWidget current, XdDigitWidget request, XdDigitW
 static void DrawValue(  XdDigitWidget w, int new, int old ) {
   int i, s[11] ;
 
-  for (i=1;i<11;i++)
+  for (i=1;i<11;i++) {
     s[i]=0;
+  }
 
   switch (new) {
       case 0: s[1]=s[2]=s[3]=s[5]=s[6]=s[7]=1; break;
@@ -224,9 +225,10 @@ static void DrawValue(  XdDigitWidget w, int new, int old ) {
       case DECPOINT_VALUE   : break;
       case DOUBLEPOINT_VALUE: s[9]=s[10]=1; break; 
     }
-    for (i=1;i<11;i++) 
+    for (i=1;i<11;i++) {
       if (s[i])
         DrawSegment(w,i);
+    }
     if (w->digit.show_decimalpoint)
       DrawSegment(w,8);
 }
