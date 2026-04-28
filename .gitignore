@@ -3,3 +3,4 @@ dial
 *.a
 /.idea
 *.bak
+/xdigit
