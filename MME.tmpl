@@ -15,7 +15,8 @@ CC=gcc
 
 CFLAGS += -std=c17
 CDEBUGFLAGS=-g
-SYS_LIBRARIES = -lXext -lXm -lXmu -lXt -lX11
+SYS_LIBRARIES = -lXext -lXm -lXmu -lXt -lX11 -lm
+LOCAL_LIBRARIES += -lXgt
 
 #ifndef MakeDistTarget
 #define MakeDistTarget(files) 				@@\
