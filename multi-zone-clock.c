@@ -14,9 +14,22 @@
 #include <stdio.h>
 #include <ctype.h>
 
+void setClocksValue(Widget *digit, char *values[4]) {
+	Arg args[1];
+	//return;
+
+	XtSetArg(args[0], XtNvalue, atoi(values[0]));
+	XtSetValues( digit[0], args, 1 );
+	XtSetArg( args[0], XtNvalue, atoi(values[1]) );
+	XtSetValues( digit[1], args, 1 );
+	XtSetArg( args[0], XtNvalue, atoi(values[2]) );
+	XtSetValues( digit[3], args, 1 );
+	XtSetArg( args[0], XtNvalue, atoi(values[3]) );
+	XtSetValues( digit[4], args, 1 );
+}
+
 void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	Widget *digit = (Widget *)client_data;
-	Arg args[1]; 
 	time_t t;
 	char *buf, *p, *values[4];
 	int i;
@@ -43,14 +56,7 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	/*
 	 * set value-resource of the digits
 	 */
-	XtSetArg( args[0], XtNvalue, atoi(values[0]) );
-	XtSetValues( digit[0], args, 1 );
-	XtSetArg( args[0], XtNvalue, atoi(values[1]) );
-	XtSetValues( digit[1], args, 1 );
-	XtSetArg( args[0], XtNvalue, atoi(values[2]) );
-	XtSetValues( digit[3], args, 1 );
-	XtSetArg( args[0], XtNvalue, atoi(values[3]) );
-	XtSetValues( digit[4], args, 1 );
+	setClocksValue(digit, values);
 
 	/*
 	 * start time out from the beginning 
@@ -103,10 +109,13 @@ int main(int argc, char **argv) {
     XtRealizeWidget(toplevel);
 
     /* init clock display */
-    TimeoutCB( (XtPointer)digit[0], NULL );
+
     
     /* add time out */
-    XtAddTimeOut( TIMEOUT, TimeoutCB, digit );
+	for ( i=0; i<NUM_CLOCKS; i++ ) {
+		TimeoutCB( (XtPointer)digit[i], NULL );
+		XtAddTimeOut( TIMEOUT, TimeoutCB, digit[i] );
+	}
     XtMainLoop();
 }
 
