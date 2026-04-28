@@ -16,7 +16,6 @@
 
 void setClocksValue(Widget *digit, char *values[4]) {
 	Arg args[1];
-	//return;
 
 	XtSetArg(args[0], XtNvalue, atoi(values[0]));
 	XtSetValues( digit[0], args, 1 );
