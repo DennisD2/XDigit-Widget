@@ -1,0 +1,29 @@
+/* 
+ * Imake template and rules for MME
+ *
+ * Copyright (C) 1993,1994 ZGDV
+ *
+ */
+
+
+CC=gcc
+
+.SUFFIXES:      .cc .C .c .exe
+
+.cc.o:
+	$(CC) $(CFLAGS) -c $*.cc
+
+CFLAGS += -std=c17
+CDEBUGFLAGS=-g
+SYS_LIBRARIES = -lXext -lXm -lXmu -lXt -lX11
+
+#ifndef MakeDistTarget
+#define MakeDistTarget(files) 				@@\
+							@@\
+dist::							@@\
+	-for i in files  ; do \				@@\
+	( cd $(ROOT) ; \				@@\
+	  tar ruvf $(DIST_TAR_FILE) CURDIR/$$i ; \	@@\
+	); \						@@\
+	done
+#endif /* MakeDistTarget */

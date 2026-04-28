@@ -1,0 +1,38 @@
+
+#include <MME.tmpl>
+
+#
+CC=gcc
+CCOPTIONS=-Wall
+CDEBUGFLAGS=-g
+INCLUDES += 
+
+LDOPTIONS = -L.
+LOCAL_LIBRARIES = 
+  EXTRA_DEFINES = 
+        DEPLIBS = $(DEPXLIB)
+SYS_LIBRARIES   = -lVideo -lXt $(XLIB) -lc 
+
+PROGRAM       	= libVideo.a xdigit
+
+SRCS	      	= Digit.c 
+SRCS2 	      	= digit.c
+SRCS3 		= xdigit.c
+
+OBJS          	= Digit.o
+OBJS2 		= digit.o
+OBJS3 		= xdigit.o
+
+PROGRAMS = $(PROGRAM)
+
+all:: install $(PROGRAMS)
+
+NormalLibraryTarget(Video,$(OBJS))
+
+NormalProgramTarget(digit,$(OBJS2),,$(LOCAL_LIBRARIES),)
+
+NormalProgramTarget(xdigit,$(OBJS3),,$(LOCAL_LIBRARIES),)
+
+#MakeDistTarget($(SRCS) $(SRCS1) $(SRCS2) $(SRCS3) Imakefile)
+
+DependTarget()

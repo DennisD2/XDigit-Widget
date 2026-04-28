@@ -1,0 +1,5 @@
+*digit.value: 0
+*digit.showDecimalPoint: False
+*digit.background: black
+*digit.foreground: white
+
