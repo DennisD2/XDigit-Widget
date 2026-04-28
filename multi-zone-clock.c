@@ -57,7 +57,6 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	/*
 	 * set value-resource of the digits
 	 */
-
 	setClocksValue(digit, num_values);
 	setClocksValue(&digit[5], num_values);
 
