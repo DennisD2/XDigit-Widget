@@ -15,7 +15,7 @@ make clean; make
 ./xdigit
 ```
 
-The xdigit clock looks lioke this:
+The xdigit clock looks like this:
 
 ![xdigit-screenshot.png](xdigit-screenshot.png)
 
