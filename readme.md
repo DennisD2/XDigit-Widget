@@ -15,7 +15,16 @@ make clean; make
 ./xdigit
 ```
 
+The xdigit clock looks lioke this:
+
+![xdigit-screenshot.png](xdigit-screenshot.png)
+
 ## The definition of a digit
+The resource XtNvalue controls the digit to be displayed. The value corresponds to the displayed number, 
+except the following values:
+* MINUS_VALUE : minus (segment 4)
+* DECPOINT_VALUE : decimal point only (segment 8)
+* DOUBLEPOINT_VALUE : double point (segments 9,10)
 
 ```
 
@@ -43,8 +52,4 @@ Segment numbers:
         --7--  -8-
 ```
 
- The resource XtNvalue controls the digit to be displayed. The value
- corresponds to the displayed number, except the following values:
- * MINUS_VALUE : minus (segment 4)
- * DECPOINT_VALUE : decimal point only (segment 8)
- * DOUBLEPOINT_VALUE : double point (segments 9,10)
+
