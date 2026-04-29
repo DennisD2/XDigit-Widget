@@ -37,7 +37,8 @@ the displayed number, except the following values:
 * DECPOINT_VALUE : decimal point only (segment 8)
 * DOUBLEPOINT_VALUE : double point (segments 9,10)
 
-Segment numbers:
+A number is displayed by drawing all required segments for that number.
+Segment indices:
 ``` 
         --1--
        |     |
@@ -49,7 +50,7 @@ Segment numbers:
 ```
 
 Each segment is drawn as a filled polygon of five points, starting with
-point index 0. Below are the points for hirizontal and vertical segments:
+point index 0. Below are the points for horizontal and vertical segments:
 ```
     origin
    *----------------+	+ segment_margin      *---------+   +
