@@ -14,6 +14,9 @@
 #include <stdio.h>
 #include <ctype.h>
 
+/*
+ * Set all widgets value resouce to digit values defined by values array
+ */
 void setClocksValue(Widget *digit[5], int values[4]) {
 	Arg args[1];
 
@@ -27,37 +30,55 @@ void setClocksValue(Widget *digit[5], int values[4]) {
 	XtSetValues( *digit[4], args, 1 );
 }
 
-void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
-	Widget **digit = (Widget**)client_data;
+#define TIME_LOCAL 0
+#define TIME_GMT 1
+
+/*
+ * Get time and convert to values suitable for the Digit widgets.
+ * Can return local time of GMT time, depending on time_zone value.
+ */
+void getCurrentTime(int num_values[4], int time_zone) {
+	char *p, *values[4];
+	int i;
 	time_t t;
-	char *buf, *p, *values[4];
-	int i, num_values[4];
 
 	for (i=0;i<4;i++) {
-	   values[i] = (char*)malloc( 2 );
-	   values[i][0] = '0'; values[i][1]='\0';
+		values[i] = (char*)malloc( 2 );
+		values[i][0] = '0'; values[i][1]='\0';
 	}
 
-    /*
-	 * Get time and convert to values suitable for the Digit widgets
-	 */
 	time( &t );
-	buf = ctime(&t);
- 	p=buf;
+	struct tm * tt;
+	if (time_zone == TIME_LOCAL) {
+		tt = localtime(&t);
+	} else {
+		tt = gmtime(&t);
+	}
+	char *buf = asctime(tt);
+	//printf("time: %s\n", buf);
+
+	p=buf;
 	while (!isdigit(*p)) p++;
 	while (isdigit(*p)) p++;
 	while (!isdigit(*p)) p++;
 	values[0][0] = *p ; p++;
-	values[1][0] = *p ; p++; p++;        	
+	values[1][0] = *p ; p++; p++;
 	values[2][0] = *p ; p++;
 	values[3][0] = *p ;
 	for ( i=0; i<4; i++ ) {
 		num_values[i] = atoi(values[i]);
 	}
-	/*
-	 * set value-resource of the digits
-	 */
+}
+
+void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
+	Widget **digit = (Widget**)client_data;
+
+	int num_values[4];
+
+	getCurrentTime((int*)num_values, TIME_LOCAL);
 	setClocksValue(digit, num_values);
+
+	getCurrentTime((int*)num_values, TIME_GMT);
 	setClocksValue(&digit[5], num_values);
 
 	/*
