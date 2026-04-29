@@ -4,6 +4,9 @@
 
 #define NUM_CLOCKS 2
 
+#define TIME_LOCAL 0
+#define TIME_GMT 1
+
 #include <X11/Intrinsic.h> 
 #include <X11/Composite.h>
 #include "Digit.h"
@@ -30,8 +33,6 @@ void setClocksValue(Widget *digit[5], int values[4]) {
 	XtSetValues( *digit[4], args, 1 );
 }
 
-#define TIME_LOCAL 0
-#define TIME_GMT 1
 
 /*
  * Get time and convert to values suitable for the Digit widgets.
