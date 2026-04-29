@@ -1,5 +1,6 @@
 /*************************************************************
- * digit3.c : another digital clock
+ * multi-zone-clock.c : multi-zone digital clock
+ * Currently, "multi" means 2 zones: local time and GMT time
  *************************************************************/
 
 #define NUM_CLOCKS 2
