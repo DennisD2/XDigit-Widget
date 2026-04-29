@@ -37,19 +37,6 @@ the displayed number, except the following values:
 * DECPOINT_VALUE : decimal point only (segment 8)
 * DOUBLEPOINT_VALUE : double point (segments 9,10)
 
-```
-    origin
-   *----------------+	+ segment_margin      *---------+   +
-   | 1------------2 |	+                     |   /\0   |   |
-   | /            \ |                         | 5|  |1  |   |
-   | \0          3/ |                         |  |  |   |   segment_height
-   | 5------------4 |                         |  |  |   |   |
-   +----------------+                         | 4|  |2  |   |
-   +-+ segment_margin                         |   \/3   |   |
-   ++ segment_delta                           +---------+   +
-                                              +---------+ segment_width 
-```
-
 Segment numbers:
 ``` 
         --1--
@@ -60,6 +47,25 @@ Segment numbers:
        |     |
         --7--  -8-
 ```
+
+Each segment is drawn as a filled polygon of five points, starting with
+point index 0. Below are the points for hirizontal and vertical segments:
+```
+    origin
+   *----------------+	+ segment_margin      *---------+   +
+   | 1------------2 |	+                     |   /\0   |   |
+   | /            \ |                         | 5|  |1  |   |
+   | \0          3/ |                         |  |  |   |   segment_height
+   | 5------------4 |                         |  |  |   |   |
+   +----------------+                         | 4|  |2  |   |
+   +-+ segment_margin                         |   \/3   |   |
+    ++ segment_delta                          +---------+   +
+                                              +---------+ segment_width 
+```
+segment_margin is the distance between left starting coordinate (0) and
+of point 1. segment_delta is the horizonal distance between point 0 and 1.
+
+
 
 ## further reading
 * ctime, gmtime and such functions - https://man7.org/linux/man-pages/man3/ctime.3.html
