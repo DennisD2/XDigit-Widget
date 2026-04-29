@@ -34,7 +34,6 @@ void setClocksValue(Widget *digit[5], int values[4]) {
 	XtSetValues( *digit[4], args, 1 );
 }
 
-
 /*
  * Get time and convert to values suitable for the Digit widgets.
  * Can return local time of GMT time, depending on time_zone value.
