@@ -38,12 +38,11 @@ void setClocksValue(Widget *digit[5], int values[4]) {
  * Can return local time of GMT time, depending on time_zone value.
  */
 void getCurrentTime(int num_values[4], int time_zone) {
-	char *p, *values[4];
+	char *p, values[4][2];
 	int i;
 	time_t t;
 
 	for (i=0;i<4;i++) {
-		values[i] = (char*)malloc( 2 );
 		values[i][0] = '0'; values[i][1]='\0';
 	}
 
@@ -70,6 +69,9 @@ void getCurrentTime(int num_values[4], int time_zone) {
 	}
 }
 
+/*
+ * Timeout callback
+ */
 void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	Widget **digit = (Widget**)client_data;
 
