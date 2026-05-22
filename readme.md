@@ -104,6 +104,13 @@ XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 
 ## Setting colors in widgets
 
+## Install motif libs+includes (OpenSuse)
+Using default OpenSuse packaging tooling:
+
+![motif-install-reqs.png](doc/motif-install-reqs.png)
 
 ## further reading
 * ctime, gmtime and such functions - https://man7.org/linux/man-pages/man3/ctime.3.html
+* Xt fonts and fontsets - https://ftp.zx.net.nz/rom/V4.0Fr1229_D1/DOCS/HTML/AQ0R4DTE/CRTGCHXX.HTM
+* Xt Intrinsics manual - https://ftpmirror.your.org/pub/misc/bitsavers/pdf/hp/9000_hpux/x11/98794-90008_Programming_With_the_Xt_Intrinsics_Sep89.pdf
+* Motif infos - https://en.wikipedia.org/wiki/Motif_(software)
