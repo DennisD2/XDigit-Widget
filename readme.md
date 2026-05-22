@@ -8,6 +8,10 @@ There is another test program called "multi-zone-clock" which shows time values 
 multiple time zones. Currently, "multi" means 3, showing local time and GMT time, and New York Time (just because
 I needed these three times).
 
+This code uses Xt, XLib and OSF/Motif library, which should be contained or at least installable via package
+from common Linux installations. These libraries are very old, and they will work even on Retro hardware (like
+my SUN Sunblade 100).
+
 ## Build
 ```shell
 make clean; make
@@ -57,10 +61,7 @@ Example result:
 ![multi-zone-clock-resources.png](doc/multi-zone-clock-resources.png)
 
 ## Install Motif libs+includes (OpenSuse)
-This code uses Xt, XLib and OSF/Motif library, which should be contained or at least installable via package
-from common Linux installations.
-
-Using default OpenSuse packaging tooling, the folllowing libs are needed for OSF/Motif:
+Using default OpenSuse packaging tooling, the following libs are needed for OSF/Motif:
 
 ![motif-install-reqs.png](doc/motif-install-reqs.png)
 
