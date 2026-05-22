@@ -118,7 +118,7 @@ char *someFont = SOMEFONT;
 XFontStruct *font_info = XLoadQueryFont(display, someFont);
 ```
 
-Then we need to set to font for the widget.
+Then we need to set the font for the widget.
 
 Motif does it slightly different that pure Xt. To set a font for a widget,
 we need to use the resource named ```XmNfontList```. 
