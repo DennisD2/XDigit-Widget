@@ -66,6 +66,43 @@ point index 0. Below are the points for horizontal and vertical segments:
 segment_margin is the distance between left starting coordinate (0) and
 of point 1. segment_delta is the horizonal distance between point 0 and 1.
 
+## Loading fonts in X Windows (Motif)
+List all available X Font names with 
+```shell
+xlsfonts
+```
+To use a font, we need to load it. The font can be loaded by
+```c++
+#define SOMEFONT "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
+
+char *someFont = SOMEFONT;
+XFontStruct *font_info = XLoadQueryFont(display, someFont);
+```
+
+Then we need to set to font for the widget.
+
+Motif does it slightly different that pure Xt. To set a font for a widget,
+we need to use the resource name ```XmNfontList```. 
+
+First create a font list from the font:
+```c++
+XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
+```
+
+Then use it when creating the widget:
+```c++
+Arg wargs[7];
+int n=0;
+
+XmString xmstr = XmStringCreate(title, XmSTRING_DEFAULT_CHARSET);
+
+XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
+XtSetArg( wargs[n], XmNfontList, font_list ); n++;
+// more resource setting removed ... 
+XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
+```
+
+## Setting colors in widgets
 
 
 ## further reading

@@ -9,6 +9,7 @@
 #define TIME_GMT 1
 #define TIME_NEW_YORK 2
 
+#include <X11/Xlib.h>
 #include <X11/Intrinsic.h> 
 #include <X11/Composite.h>
 
@@ -120,10 +121,15 @@ void createClockWidgets(Widget compo, Widget digit[], int row) {
 	}
 }
 
+XFontStruct *fontStruct3;
+XFontSet font_set3;
+XmFontList font_list4;
+
 typedef struct _Resources {
 	Pixel foreground;
 	Pixel background;
 	XFontStruct *fontStruct;
+	XFontStruct *fontStruct2;
 } Resources;
 
 static Resources theResources;
@@ -138,10 +144,13 @@ static XtResource resourceSpec[] = {
 	{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
 		XtOffsetOf(Resources, fontStruct),
 		XtRString, "XtDefaultFont"},
+	{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
+		XtOffsetOf(Resources, fontStruct2),
+		XtRString, "-adobe-courier-bold-o-normal--10-100-75-75-m-60-iso8859-10"},
 };
 
 void createClockLabel(Widget compo, int numClock, char* title) {
-	Arg wargs[6];
+	Arg wargs[7];
 	int n=0;
 
 	XmString xmstr = XmStringCreate(title, XmSTRING_DEFAULT_CHARSET);
@@ -150,7 +159,9 @@ void createClockLabel(Widget compo, int numClock, char* title) {
 	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
 	XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
 	XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
-	XtSetArg( wargs[n], XtNfont, theResources.fontStruct ); n++;
+	//XtSetArg( wargs[n], XtNfont, fontStruct3 ); n++;
+	//XtSetArg( wargs[n], XtNfontSet, font_set3 ); n++;
+	XtSetArg( wargs[n], XmNfontList, font_list4 ); n++;
 	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 }
 
@@ -167,19 +178,65 @@ int main(int argc, char **argv) {
 	XtGetApplicationResources(toplevel, &theResources,
 						   resourceSpec, XtNumber(resourceSpec), NULL, 0);
 
+//#define DEFAULT_FONT_NAME     "-*-SCREEN-*-*-R-Normal--*-*, -*"
+#define DEFAULT_FONT_NAME     "*-*-*-*-*-*--*-*, -*"
+	char *base_font_name = DEFAULT_FONT_NAME;
+	char **missing_list;
+	int missing_count;
+	char *def_string;
+	Display *display = XtDisplay(toplevel);
+
+	XFontSet font_set = XCreateFontSet(display, base_font_name, &missing_list,
+							   &missing_count, &def_string);
+	if (missing_count > 0) {
+		fprintf(stderr, "The following charsets are missing: \n");
+		for (i=0; i<missing_count; i++)
+			fprintf(stderr, "%s \n", missing_list[i]);
+		XFreeStringList(missing_list);
+	}
+    XFontStruct **fonts;
+    char **names;
+	int num_fonts = XFontsOfFontSet( font_set, &fonts, &names);
+	for (i=0; i<num_fonts; i++) {
+		printf("Font[%d]: %s\n", i, names[i]);
+	}
+#define SOMEFONT "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
+	char *someFont = SOMEFONT;
+	XFontStruct *font_info = XLoadQueryFont(display, someFont);
+	if (font_info == NULL) {
+		printf("No fonts\n");
+	}
+	fontStruct3 = font_info;
+
+	font_set = XCreateFontSet(display, someFont, &missing_list,
+						   &missing_count, &def_string);
+	if (missing_count > 0) {
+		fprintf(stderr, "The following charsets are missing: \n");
+		for (i=0; i<missing_count; i++)
+			fprintf(stderr, "%s \n", missing_list[i]);
+		XFreeStringList(missing_list);
+	}
+	num_fonts = XFontsOfFontSet( font_set, &fonts, &names);
+	for (i=0; i<num_fonts; i++) {
+		printf("Font[%d]: %s\n", i, names[i]);
+	}
+	font_set3 = font_set;
+
+	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
+	font_list4 = fontList;
+
     /*
      * Create a container widget for all the digits
      */
     n=0;
-    XtSetArg( args[n], XtNwidth, (Dimension)400 ); n++;
+    XtSetArg( args[n], XtNwidth, (Dimension)500 ); n++;
     XtSetArg( args[n], XtNheight, (Dimension)NUM_CLOCKS*100 ); n++;
     compo = XtCreateManagedWidget("panel", compositeWidgetClass,
 	toplevel, args, n);
-    /*
+
+	/*
      * Create some digit widgets 
      */
-
-
 	for ( i=0; i<NUM_CLOCKS; i++ ) {
 		createClockLabel(compo,i, clockTitle[i]);
 		createClockWidgets(compo, digit[i], i);
