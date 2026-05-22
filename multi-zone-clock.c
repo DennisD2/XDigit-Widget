@@ -3,10 +3,11 @@
  * Currently, "multi" means 2 zones: local time and GMT time
  *************************************************************/
 
-#define NUM_CLOCKS 2
+#define NUM_CLOCKS 3
 
 #define TIME_LOCAL 0
 #define TIME_GMT 1
+#define TIME_NEW_YORK 2
 
 #include <X11/Intrinsic.h> 
 #include <X11/Composite.h>
@@ -83,6 +84,11 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 
 	getCurrentTime((int*)num_values, TIME_GMT);
 	setClocksValue(&digit[5], num_values);
+
+	getCurrentTime((int*)num_values, TIME_GMT);
+	num_values[1] -= 4 ;
+	if (num_values[1] < 0) num_values[1] += 12;
+	setClocksValue(&digit[10], num_values);
 
 	/*
 	 * start time out from the beginning 
