@@ -136,8 +136,7 @@ XmFontList the_font_list;
 typedef struct _Resources {
 	Pixel foreground;
 	Pixel background;
-	XFontStruct *fontStruct;
-	XFontStruct *fontStruct2;
+	/*XFontStruct *fontStruct; */
 } Resources;
 
 static Resources theResources;
@@ -149,12 +148,10 @@ static XtResource resourceSpec[] = {
 	{ XtNbackground, XtCBackground, XtRPixel, sizeof(Pixel),
 	  XtOffsetOf(Resources, background),
 	  XtRString, "XtDefaultBackground"},
-	{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
+	/*{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
 		XtOffsetOf(Resources, fontStruct),
-		XtRString, "XtDefaultFont"},
-	{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
-		XtOffsetOf(Resources, fontStruct2),
-		XtRString, "-adobe-courier-bold-o-normal--10-100-75-75-m-60-iso8859-10"},
+		XtRString, "XtDefaultFont"},*/
+
 };
 
 void createClockLabel(Widget compo, int numClock, char* title) {

@@ -71,6 +71,8 @@ List all available X Font names with
 ```shell
 xlsfonts
 ```
+See also own file ```listfonts.c``` .
+
 To use a font, we need to load it. The font can be loaded by
 ```c++
 #define SOMEFONT "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
@@ -103,11 +105,44 @@ XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 ```
 
 ## Setting colors in widgets
+Get existing values like seen below.
 
+Define some structures to receive the values:
+```c++
+typedef struct _Resources {
+	Pixel foreground;
+	Pixel background;
+} Resources;
+
+static Resources theResources;
+
+static XtResource resourceSpec[] = {
+	{ XtNforeground, XtCForeground, XtRPixel, sizeof(Pixel),
+	  XtOffsetOf(Resources, foreground),
+	  XtRString, "XtDefaultForeground"},
+	{ XtNbackground, XtCBackground, XtRPixel, sizeof(Pixel),
+	  XtOffsetOf(Resources, background),
+	  XtRString, "XtDefaultBackground"},
+};
+```
+
+And the function call to fill these structures:
+```c++
+XtGetApplicationResources(toplevel, &theResources,
+			   resourceSpec, XtNumber(resourceSpec), NULL, 0);
+```
+
+Use resources in Widget args:
+```c++
+XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
+XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
+```
 ## Install motif libs+includes (OpenSuse)
 Using default OpenSuse packaging tooling:
 
 ![motif-install-reqs.png](doc/motif-install-reqs.png)
+
+
 
 ## further reading
 * ctime, gmtime and such functions - https://man7.org/linux/man-pages/man3/ctime.3.html
