@@ -164,8 +164,6 @@ void createClockLabel(Widget compo, int numClock, char* title) {
 	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
 	XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
 	XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
-	//XtSetArg( wargs[n], XtNfont, fontStruct3 ); n++;
-	//XtSetArg( wargs[n], XtNfontSet, font_set3 ); n++;
 	XtSetArg( wargs[n], XmNfontList, the_font_list ); n++;
 	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 }
@@ -177,7 +175,7 @@ int main(int argc, char **argv) {
     /*
      * Initialize the Intrinsics.
      */   
-    toplevel = XtInitialize(argv[0], "XDigit", NULL, 
+    toplevel = XtInitialize(argv[0], "MultiZoneClock", NULL,
                             0, &argc, argv);
 	/* get apps resources for use in createClockLabel() */
 	XtGetApplicationResources(toplevel, &theResources,
@@ -233,7 +231,7 @@ int main(int argc, char **argv) {
 	toplevel, args, n);
 
 	/*
-     * Create some digit widgets 
+     * Create all digit widgets
      */
 	for ( i=0; i<NUM_CLOCKS; i++ ) {
 		createClockLabel(compo,i, clockTitle[i]);
