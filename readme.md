@@ -13,6 +13,14 @@ from common Linux installations. These libraries are very old, and they will wor
 my SUN Sunblade 100).
 
 ## Build
+Generate Makefile using xmkmf/imake:
+```shell
+-bash-5.3$ xmkmf
+mv -f Makefile Makefile.bak
+imake -DUseInstalled -I/usr/local/lib/X11/config
+```
+
+Build lib and executables:
 ```shell
 make clean; make
 ```
