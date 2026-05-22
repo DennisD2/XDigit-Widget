@@ -79,6 +79,16 @@ void getCurrentTime(int num_values[4], int time_zone) {
 }
 
 /*
+ * Remove/add some integer offset to a 24 hour value in v[] array
+ */
+void change_hours(int * v, int i) {
+	int h = v[0]*10 + v[1];
+	h += i % 24;
+	v[0] = h/10;
+	v[1] = h%10;
+}
+
+/*
  * Timeout callback
  */
 void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
@@ -93,8 +103,8 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	setClocksValue(&digit[5], num_values);
 
 	getCurrentTime((int*)num_values, TIME_GMT);
-	num_values[1] -= 4 ;
-	if (num_values[1] < 0) num_values[1] += 12;
+	change_hours( num_values, -4);
+
 	setClocksValue(&digit[10], num_values);
 
 	/*
