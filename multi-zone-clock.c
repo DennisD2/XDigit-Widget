@@ -208,16 +208,21 @@ int main(int argc, char **argv) {
 	int num_fonts = XFontsOfFontSet( font_set, &fonts, &names);
 	for (i=0; i<num_fonts; i++) {
 		printf("Font[%d]: %s\n", i, names[i]);
-	}*/
+	}
+
+	Then we have a fontset and a font and may use that in some non-Motif widgets.
+	Motif uses an own ressource named XmNfontList, so the solution looks different, see below
+	*/
 
 	/* Solution for Motif */
 #define SOMEFONT "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
 	char *someFont = SOMEFONT;
+	/* load font */
 	XFontStruct *font_info = XLoadQueryFont(display, someFont);
 	if (font_info == NULL) {
 		printf("No fonts\n");
 	}
-
+	/* create a motif font list and store in global var for later use */
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	the_font_list = fontList;
 
