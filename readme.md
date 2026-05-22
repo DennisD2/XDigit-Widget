@@ -5,7 +5,8 @@ There is a test program called "xdigits" which uses 5 of these widgets to implem
 a simple digital clock.
 
 There is another test program called "multi-zone-clock" which shows time values for
-multiple time zones. Currently, "multi" means 2, showing local time and GMT time.
+multiple time zones. Currently, "multi" means 3, showing local time and GMT time, and New York Time (just because
+I needed these three times).
 
 ## Build
 ```shell
@@ -30,7 +31,42 @@ The multi-zone-clock looks like this:
 
 ![multi-zone-clock-screenshot.png](doc/multi-zone-clock-screenshot.png)
 
-## The definition of a digit
+For pretty colors see below in resources section.
+
+## Load resources with xrdb
+```shell
+# list existing definitions
+xrdb --query
+# add local ressources
+xrdb --merge Digit.ad
+```
+
+Example content of Digit.ad:
+```shell
+*clockPanel.background: black
+*digit.value: 0
+*digit.showDecimalPoint: False
+*digit.background: black
+*digit.foreground: green
+*clockTitle.background: black
+*clockTitle.foreground: red
+```
+
+Example result:
+
+![multi-zone-clock-resources.png](doc/multi-zone-clock-resources.png)
+
+## Install Motif libs+includes (OpenSuse)
+This code uses Xt, XLib and OSF/Motif library, which should be contained or at least installable via package
+from common Linux installations.
+
+Using default OpenSuse packaging tooling, the folllowing libs are needed for OSF/Motif:
+
+![motif-install-reqs.png](doc/motif-install-reqs.png)
+
+## Details on implementation
+
+### The definition of a digit
 The resource XtNvalue controls the digit to be displayed. The value corresponds to 
 the displayed number, except the following values:
 * MINUS_VALUE : minus (segment 4)
@@ -66,7 +102,7 @@ point index 0. Below are the points for horizontal and vertical segments:
 segment_margin is the distance between left starting coordinate (0) and
 of point 1. segment_delta is the horizonal distance between point 0 and 1.
 
-## Loading fonts in X Windows (Motif)
+### Loading fonts in X Windows (Motif)
 List all available X Font names with 
 ```shell
 xlsfonts
@@ -104,7 +140,7 @@ XtSetArg( wargs[n], XmNfontList, font_list ); n++;
 XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 ```
 
-## Setting colors in widgets
+### Setting colors in widgets
 Get existing values like seen below.
 
 Define some structures to receive the values:
@@ -138,37 +174,7 @@ XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground
 XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 ```
 
-## Load ressources with xrdb
-```shell
-# list existing definitions
-xrdb --query
-# add local ressources
-xrdb --merge Digit.ad
-```
-
-Example content of Digit.ad:
-```shell
-*clockPanel.background: black
-*digit.value: 0
-*digit.showDecimalPoint: False
-*digit.background: black
-*digit.foreground: green
-*clockTitle.background: black
-*clockTitle.foreground: red
-```
-
-Example result:
-
-![multi-zone-clock-resources.png](doc/multi-zone-clock-resources.png)
-
-## Install motif libs+includes (OpenSuse)
-Using default OpenSuse packaging tooling:
-
-![motif-install-reqs.png](doc/motif-install-reqs.png)
-
-
-
-## further reading
+## Further reading
 * ctime, gmtime and such functions - https://man7.org/linux/man-pages/man3/ctime.3.html
 * Xt fonts and fontsets - https://ftp.zx.net.nz/rom/V4.0Fr1229_D1/DOCS/HTML/AQ0R4DTE/CRTGCHXX.HTM
 * Xt Intrinsics manual - https://ftpmirror.your.org/pub/misc/bitsavers/pdf/hp/9000_hpux/x11/98794-90008_Programming_With_the_Xt_Intrinsics_Sep89.pdf
