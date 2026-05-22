@@ -123,6 +123,7 @@ void createClockWidgets(Widget compo, Widget digit[], int row) {
 typedef struct _Resources {
 	Pixel foreground;
 	Pixel background;
+	XFontStruct *fontStruct;
 } Resources;
 
 static Resources theResources;
@@ -134,18 +135,22 @@ static XtResource resourceSpec[] = {
 	{ XtNbackground, XtCBackground, XtRPixel, sizeof(Pixel),
 	  XtOffsetOf(Resources, background),
 	  XtRString, "XtDefaultBackground"},
+	{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
+		XtOffsetOf(Resources, fontStruct),
+		XtRString, "XtDefaultFont"},
 };
 
 void createClockLabel(Widget compo, int numClock, char* title) {
-	Arg wargs[5];
-	int n;
-	n=0;
+	Arg wargs[6];
+	int n=0;
+
 	XmString xmstr = XmStringCreate(title, XmSTRING_DEFAULT_CHARSET);
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
 	XtSetArg( wargs[n], XtNx, (Position)10 + 5*60 + 5); n++;
 	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
 	XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
 	XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
+	XtSetArg( wargs[n], XtNfont, theResources.fontStruct ); n++;
 	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 }
 
