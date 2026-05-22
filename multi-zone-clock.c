@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
+char *clockTitle[NUM_CLOCKS] = { "Frankfurt", "GMT", "New York"};
+
 /*
  * Set all widgets value resouce to digit values defined by values array
  */
@@ -118,6 +120,17 @@ void createClockWidgets(Widget compo, Widget digit[], int row) {
 	}
 }
 
+void createClockLabel(Widget compo, int numClock, char* title) {
+	Arg wargs[3];
+	int n;
+	n=0;
+	XmString xmstr = XmStringCreate(title, XmSTRING_DEFAULT_CHARSET);
+	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
+	XtSetArg( wargs[n], XtNx, (Position)10 + 5*60 + 5); n++;
+	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
+	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
+}
+
 int main(int argc, char **argv) {
     Widget toplevel, compo, digit[NUM_CLOCKS][5];
     Arg args[8]; int n, i;
@@ -139,15 +152,10 @@ int main(int argc, char **argv) {
     /*
      * Create some digit widgets 
      */
-	Arg wargs[3];
+
 
 	for ( i=0; i<NUM_CLOCKS; i++ ) {
-		n=0;
-		XmString xmstr = XmStringCreate("test", XmSTRING_DEFAULT_CHARSET);
-		XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
-		XtSetArg( wargs[n], XtNx, (Position)10 ); n++;
-		XtSetArg( wargs[n], XtNy, (Position)i*100 ); n++;
-		XtCreateManagedWidget("clockname", xmLabelWidgetClass, compo, wargs, n);
+		createClockLabel(compo,i, clockTitle[i]);
 		createClockWidgets(compo, digit[i], i);
 	}
     XtRealizeWidget(toplevel);
