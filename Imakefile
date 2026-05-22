@@ -10,15 +10,17 @@ LOCAL_LIBRARIES = -lWidgets -lXm
 #DEPLIBS         = $(DEPXLIB)
 #SYS_LIBRARIES   +=
 
-PROGRAM       	= libWidgets.a xdigit multi-zone-clock
+PROGRAM       	= libWidgets.a xdigit multi-zone-clock listfonts
 
 SRCS	      	= Digit.c 
 SRCS1 		    = xdigit.c
 SRCS2 		    = multi-zone-clock.c
+SRCS3 		    = listfonts.c
 
 OBJS          	= Digit.o
 OBJS1 		    = xdigit.o
 OBJS2 		    = multi-zone-clock.o
+OBJS3 		    = listfonts.o
 
 PROGRAMS        = $(PROGRAM)
 
@@ -29,6 +31,8 @@ NormalLibraryTarget(Widgets,$(OBJS))
 NormalProgramTarget(xdigit,$(OBJS1),,$(LOCAL_LIBRARIES),)
 
 NormalProgramTarget(multi-zone-clock,$(OBJS2),,$(LOCAL_LIBRARIES),)
+
+NormalProgramTarget(listfonts,$(OBJS3),,$(LOCAL_LIBRARIES),)
 
 #MakeDistTarget($(SRCS) $(SRCS1) widgets.tmpl Imakefile)
 

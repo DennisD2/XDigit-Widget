@@ -5,3 +5,4 @@ dial
 *.bak
 /xdigit
 multi-zone-clock
+/listfonts

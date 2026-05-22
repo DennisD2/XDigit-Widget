@@ -131,9 +131,7 @@ void createClockWidgets(Widget compo, Widget digit[], int row) {
 	}
 }
 
-XFontStruct *fontStruct3;
-XFontSet font_set3;
-XmFontList font_list4;
+XmFontList the_font_list;
 
 typedef struct _Resources {
 	Pixel foreground;
@@ -171,7 +169,7 @@ void createClockLabel(Widget compo, int numClock, char* title) {
 	XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 	//XtSetArg( wargs[n], XtNfont, fontStruct3 ); n++;
 	//XtSetArg( wargs[n], XtNfontSet, font_set3 ); n++;
-	XtSetArg( wargs[n], XmNfontList, font_list4 ); n++;
+	XtSetArg( wargs[n], XmNfontList, the_font_list ); n++;
 	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 }
 
@@ -188,14 +186,15 @@ int main(int argc, char **argv) {
 	XtGetApplicationResources(toplevel, &theResources,
 						   resourceSpec, XtNumber(resourceSpec), NULL, 0);
 
-//#define DEFAULT_FONT_NAME     "-*-SCREEN-*-*-R-Normal--*-*, -*"
-#define DEFAULT_FONT_NAME     "*-*-*-*-*-*--*-*, -*"
-	char *base_font_name = DEFAULT_FONT_NAME;
+	Display *display = XtDisplay(toplevel);
+/*
+    For pure (non-Motif) we would do it like this:
+
+    #define DEFAULT_FONT_NAME     "*-*-*-*-*-*--*-*, -*"
+    char *base_font_name = DEFAULT_FONT_NAME;
 	char **missing_list;
 	int missing_count;
 	char *def_string;
-	Display *display = XtDisplay(toplevel);
-
 	XFontSet font_set = XCreateFontSet(display, base_font_name, &missing_list,
 							   &missing_count, &def_string);
 	if (missing_count > 0) {
@@ -209,31 +208,18 @@ int main(int argc, char **argv) {
 	int num_fonts = XFontsOfFontSet( font_set, &fonts, &names);
 	for (i=0; i<num_fonts; i++) {
 		printf("Font[%d]: %s\n", i, names[i]);
-	}
+	}*/
+
+	/* Solution for Motif */
 #define SOMEFONT "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
 	char *someFont = SOMEFONT;
 	XFontStruct *font_info = XLoadQueryFont(display, someFont);
 	if (font_info == NULL) {
 		printf("No fonts\n");
 	}
-	fontStruct3 = font_info;
-
-	font_set = XCreateFontSet(display, someFont, &missing_list,
-						   &missing_count, &def_string);
-	if (missing_count > 0) {
-		fprintf(stderr, "The following charsets are missing: \n");
-		for (i=0; i<missing_count; i++)
-			fprintf(stderr, "%s \n", missing_list[i]);
-		XFreeStringList(missing_list);
-	}
-	num_fonts = XFontsOfFontSet( font_set, &fonts, &names);
-	for (i=0; i<num_fonts; i++) {
-		printf("Font[%d]: %s\n", i, names[i]);
-	}
-	font_set3 = font_set;
 
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
-	font_list4 = fontList;
+	the_font_list = fontList;
 
     /*
      * Create a container widget for all the digits
