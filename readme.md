@@ -146,6 +146,21 @@ xrdb --query
 xrdb --merge Digit.ad
 ```
 
+Example content of Digit.ad:
+```shell
+*clockPanel.background: black
+*digit.value: 0
+*digit.showDecimalPoint: False
+*digit.background: black
+*digit.foreground: green
+*clockTitle.background: black
+*clockTitle.foreground: red
+```
+
+Example result:
+
+![multi-zone-clock-resources.png](doc/multi-zone-clock-resources.png)
+
 ## Install motif libs+includes (OpenSuse)
 Using default OpenSuse packaging tooling:
 
