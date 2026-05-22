@@ -5,10 +5,10 @@ CCOPTIONS       =-Wall
 #INCLUDES        +=
 
 LDOPTIONS       = -L.
-#LOCAL_LIBRARIES =
+LOCAL_LIBRARIES = -lWidgets -lXm
 #  EXTRA_DEFINES =
 #DEPLIBS         = $(DEPXLIB)
-SYS_LIBRARIES   += -lWidgets
+#SYS_LIBRARIES   +=
 
 PROGRAM       	= libWidgets.a xdigit multi-zone-clock
 

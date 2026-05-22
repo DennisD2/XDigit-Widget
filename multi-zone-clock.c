@@ -11,6 +11,10 @@
 
 #include <X11/Intrinsic.h> 
 #include <X11/Composite.h>
+
+#include <Xm/Xm.h>
+#include <Xm/Label.h>
+
 #include "Digit.h"
 
 #include <time.h>
@@ -128,14 +132,22 @@ int main(int argc, char **argv) {
      * Create a container widget for all the digits
      */
     n=0;
-    XtSetArg( args[n], XtNwidth, (Dimension)300 ); n++;
+    XtSetArg( args[n], XtNwidth, (Dimension)400 ); n++;
     XtSetArg( args[n], XtNheight, (Dimension)NUM_CLOCKS*100 ); n++;
     compo = XtCreateManagedWidget("panel", compositeWidgetClass,
 	toplevel, args, n);
     /*
      * Create some digit widgets 
      */
+	Arg wargs[3];
+
 	for ( i=0; i<NUM_CLOCKS; i++ ) {
+		n=0;
+		XmString xmstr = XmStringCreate("test", XmSTRING_DEFAULT_CHARSET);
+		XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
+		XtSetArg( wargs[n], XtNx, (Position)10 ); n++;
+		XtSetArg( wargs[n], XtNy, (Position)i*100 ); n++;
+		XtCreateManagedWidget("clockname", xmLabelWidgetClass, compo, wargs, n);
 		createClockWidgets(compo, digit[i], i);
 	}
     XtRealizeWidget(toplevel);
