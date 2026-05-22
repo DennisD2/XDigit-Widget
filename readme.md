@@ -137,6 +137,15 @@ Use resources in Widget args:
 XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
 XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 ```
+
+## Load ressources with xrdb
+```shell
+# list existing definitions
+xrdb --query
+# add local ressources
+xrdb --merge Digit.ad
+```
+
 ## Install motif libs+includes (OpenSuse)
 Using default OpenSuse packaging tooling:
 

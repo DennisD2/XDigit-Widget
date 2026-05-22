@@ -1,5 +1,10 @@
+*clockPanel.background: black
 *digit.value: 0
 *digit.showDecimalPoint: False
 *digit.background: black
-*digit.foreground: white
+*digit.foreground: green
+*clockTitle.background: black
+*clockTitle.foreground: red
+
+
 

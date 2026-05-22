@@ -162,8 +162,8 @@ void createClockLabel(Widget compo, int numClock, char* title) {
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
 	XtSetArg( wargs[n], XtNx, (Position)10 + 5*60 + 5); n++;
 	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
-	XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
-	XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
+	//XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
+	//XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 	XtSetArg( wargs[n], XmNfontList, the_font_list ); n++;
 	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 }
@@ -227,7 +227,7 @@ int main(int argc, char **argv) {
     n=0;
     XtSetArg( args[n], XtNwidth, (Dimension)500 ); n++;
     XtSetArg( args[n], XtNheight, (Dimension)NUM_CLOCKS*100 ); n++;
-    compo = XtCreateManagedWidget("panel", compositeWidgetClass,
+    compo = XtCreateManagedWidget("clockPanel", compositeWidgetClass,
 	toplevel, args, n);
 
 	/*
