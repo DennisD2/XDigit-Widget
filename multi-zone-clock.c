@@ -120,14 +120,32 @@ void createClockWidgets(Widget compo, Widget digit[], int row) {
 	}
 }
 
+typedef struct _Resources {
+	Pixel foreground;
+	Pixel background;
+} Resources;
+
+static Resources theResources;
+
+static XtResource resourceSpec[] = {
+	{ XtNforeground, XtCForeground, XtRPixel, sizeof(Pixel),
+	  XtOffsetOf(Resources, foreground),
+	  XtRString, "XtDefaultForeground"},
+	{ XtNbackground, XtCBackground, XtRPixel, sizeof(Pixel),
+	  XtOffsetOf(Resources, background),
+	  XtRString, "XtDefaultBackground"},
+};
+
 void createClockLabel(Widget compo, int numClock, char* title) {
-	Arg wargs[3];
+	Arg wargs[5];
 	int n;
 	n=0;
 	XmString xmstr = XmStringCreate(title, XmSTRING_DEFAULT_CHARSET);
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
 	XtSetArg( wargs[n], XtNx, (Position)10 + 5*60 + 5); n++;
 	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
+	XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
+	XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 }
 
@@ -140,6 +158,9 @@ int main(int argc, char **argv) {
      */   
     toplevel = XtInitialize(argv[0], "XDigit", NULL, 
                             0, &argc, argv);
+	/* get apps resources for use in createClockLabel() */
+	XtGetApplicationResources(toplevel, &theResources,
+						   resourceSpec, XtNumber(resourceSpec), NULL, 0);
 
     /*
      * Create a container widget for all the digits
