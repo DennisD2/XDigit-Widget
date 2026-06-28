@@ -142,13 +142,13 @@ static void Resize (XdDigitWidget w) {
   /*
    * recalculate height, width and delta for a segment 
    */
-  w->digit.segment_height = 10*w->core.height/25;
+  w->digit.segment_height = 10*w->core.height/25; /* 40% of core.height */
   if (w->digit.segment_height == 0)
     w->digit.segment_height=1;
-  w->digit.segment_width = w->digit.segment_height/5;
+  w->digit.segment_width = w->digit.segment_height/5; /* 20% of segment height, thus 8% of core.height */
   if (w->digit.segment_width == 0)
     w->digit.segment_width=1;
-  w->digit.segment_delta = w->digit.segment_width/2;
+  w->digit.segment_delta = w->digit.segment_width/2; /* 50% of segment width, thus 10% of segment height and thus 4% of core height */
   if (w->digit.segment_delta == 0)
     w->digit.segment_delta = 1;
 }
@@ -235,17 +235,20 @@ static void DrawValue(  XdDigitWidget w, int new, int old ) {
 
 static void DrawSegment( XdDigitWidget w, int id ){
   int sw = w->digit.segment_width, sh = w->digit.segment_height;
+  int sd = w->digit.segment_delta ;
+
   int dir = DIR_VERTICAL;
   int x=0,y=0;
 
   switch (id) {
     case 1: x=sw/2; y=0; dir=DIR_HORIZONTAL; break;
-    case 2: x=0; y=sw/2; break;
-    case 3: x=sh; y=sw/2; break;
-    case 4: x=sw/2; y=sh +sw/2 ; dir=DIR_HORIZONTAL; break;
-    case 5: x=0; y=sh+sw/2 +sw/2 ; break;
-    case 6: x=sh; y=sh+sw/2 +sw/2 ; break;
+    case 2: x=0; y=sw/2 + sd/2; break;
+    case 3: x=sh; y=sw/2 + sd/2; break;
+    case 4: x=sw/2; y=sh + sw/2 ; dir=DIR_HORIZONTAL; break;
+    case 5: x=0; y=sh + sw + sd/2 ; break;
+    case 6: x=sh; y=sh + sw + sd/2 ; break;
     case 7: x=sw/2; y=2*sh +2*sw/2 ; dir=DIR_HORIZONTAL; break;
+
     case 8: x=sh+2*w->digit.segment_delta; y=2*sh +sw ; break;
     case 9: x=sh/2-sw/2; y = sh/2-sw/2; break;
     case 10: x=sh/2-sw/2; y = sh + sh/2-sw/2 ; break;
@@ -263,20 +266,20 @@ static void _drawSegment( XdDigitWidget w, int ox, int oy, int dir ) {
   int sd = w->digit.segment_delta ;
 
   if (dir==DIR_VERTICAL) {
-    p[0].x = ox + sw/2; p[0].y = oy + sm ;
-    p[1].x = (sw/2-sm); p[1].y = sd ;
-    p[2].x = 0; p[2].y =  w->digit.segment_height - 2*sm - sd ;
-    p[3].x = -p[1].x ; p[3].y = sd ;
-    p[4].x = p[3].x ; p[4].y = -sd;
+    p[0].x = ox + sm + sw/2 ; p[0].y = oy + sm;
+    p[1].x = sw/2; p[1].y = sd;
+    p[2].x = 0; p[2].y =  w->digit.segment_height - 2*sd;
+    p[3].x = -sw/2 ; p[3].y = sd;
+    p[4].x = -sw/2 ; p[4].y = -sd;
     p[5].x = 0; p[5].y = -p[2].y;
   }
   else {
-    p[0].x = ox + sm; p[0].y = oy + sw/2 ;
-    p[1].x = sd; p[1].y = -(sw/2-sm);
-    p[2].x = w->digit.segment_height - 2*sm - 2*sd ; p[2].y =  0 ;
-    p[3].x = sd ; p[3].y = -p[1].y ;
-    p[4].x = -sd ; p[4].y = p[3].x ;
-    p[5].x = -p[2].x ; p[5].y = 0 ;
+    p[0].x = ox + sm; p[0].y = oy + sm + sw/2;
+    p[1].x = sd; p[1].y = -sw/2;
+    p[2].x = w->digit.segment_height - 2*sd ; p[2].y =  0;
+    p[3].x = sd ; p[3].y = sw/2;
+    p[4].x = -sd ; p[4].y = sw/2;
+    p[5].x = -p[2].x ; p[5].y = 0;
   }
   XFillPolygon( XtDisplay(w), XtWindow(w),
     w->digit.segment_GC, p, 6, Convex, CoordModePrevious );

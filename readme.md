@@ -96,20 +96,38 @@ Segment indices:
 
 Each segment is drawn as a filled polygon of five points, starting with
 point index 0. Below are the points for horizontal and vertical segments:
+
+Horizontal:
 ```
-    origin
-   *----------------+	+ segment_margin      *---------+   +
-   | 1------------2 |	+                     |   /\0   |   |
-   | /            \ |                         | 5|  |1  |   |
-   | \0          3/ |                         |  |  |   |   segment_height
-   | 5------------4 |                         |  |  |   |   |
-   +----------------+                         | 4|  |2  |   |
-   +-+ segment_margin                         |   \/3   |   |
-    ++ segment_delta                          +---------+   +
-                                              +---------+ segment_width 
+   origin
+   *----------------+	+ segment_margin    +
+   | 1------------2 |   +                   |                     
+   | /            \ |                       | segment_height                      
+   | \0          3/ |                       |
+   | 5------------4 |                       |
+   +----------------+                       +
+                  +-+ segment_margin  
+    ++ segment_delta   
+   +<-segmentwidth->+
 ```
-segment_margin is the distance between left starting coordinate (0) and
-of point 1. segment_delta is the horizonal distance between point 0 and 1.
+
+Vertical:
+```
+                         origin
+   + segment_margin      *---------+   +
+   +                     |   /\0   |   |
+                         | 5|  |1  |   |
+                         |  |  |   |   segment_height
+                         |  |  |   |   |
+                         | 4|  |2  |   | +
+                         |   \/3   |   | + segment_delta
+                         +---------+   +
+                         +--+ segment_margin
+                         +---------+ segment_width 
+```
+segment_height and segment width is outer box for segment drawing.
+segment_margin is the minimum distance between outer box and polygon for segment area, both in x and y dimension. 
+segment_delta is the horizonal distance between point 0 and 1.
 
 ### Loading fonts in X Windows (Motif)
 List all available X Font names with 
