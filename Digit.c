@@ -239,14 +239,15 @@ static void DrawSegment( XdDigitWidget w, int id ){
 
   int dir = DIR_VERTICAL;
   int x=0,y=0;
+  int mini_margin = sd/2;
 
   switch (id) {
     case 1: x=sw/2; y=0; dir=DIR_HORIZONTAL; break;
-    case 2: x=0; y=sw/2 + sd/2; break;
-    case 3: x=sh; y=sw/2 + sd/2; break;
+    case 2: x=0; y=sw/2 + mini_margin; break;
+    case 3: x=sh; y=sw/2 + mini_margin; break;
     case 4: x=sw/2; y=sh + sw/2 ; dir=DIR_HORIZONTAL; break;
-    case 5: x=0; y=sh + sw + sd/2 ; break;
-    case 6: x=sh; y=sh + sw + sd/2 ; break;
+    case 5: x=0; y=sh + sw + mini_margin ; break;
+    case 6: x=sh; y=sh + sw + mini_margin ; break;
     case 7: x=sw/2; y=2*sh +2*sw/2 ; dir=DIR_HORIZONTAL; break;
 
     case 8: x=sh+2*w->digit.segment_delta; y=2*sh +sw ; break;
