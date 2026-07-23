@@ -32,9 +32,9 @@ typedef struct _ClockDigitsStruct {
 typedef struct _DigitStruct {
 	int numClocks;
 	ClockDigitsStruct *clockDigits;
-} DigitStruct;
+} ClocksStruct;
 
-DigitStruct digitStruct;
+ClocksStruct clocksStruct;
 
 /*
  * Set all widgets value resouce to digit values defined by values array
@@ -103,13 +103,13 @@ void change_hours(int * v, int i) {
  * Timeout callback
  */
 void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
-	DigitStruct *clockDigits  = (DigitStruct *)client_data;
+	ClocksStruct *clockStruct  = (ClocksStruct *)client_data;
 	int num_values[4];
 
 	int i;
-	for (i=0; i<clockDigits->numClocks; i++) {
+	for (i=0; i<clockStruct->numClocks; i++) {
 		getCurrentTime((int*)num_values, TIME_LOCAL);
-		setClocksValue(clockDigits->clockDigits[i].digit, num_values);
+		setClocksValue(clockStruct->clockDigits[i].digit, num_values);
 	}
 	/*
 	getCurrentTime((int*)num_values, TIME_LOCAL);
@@ -126,7 +126,7 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	/*
 	 * start time out from the beginning 
 	 */
-	XtAddTimeOut( TIMEOUT, TimeoutCB, &digitStruct );
+	XtAddTimeOut( TIMEOUT, TimeoutCB, clockStruct );
 }
 
 void createClockWidgets(Widget compo, ClockDigitsStruct *clockDigits, int row) {
@@ -285,19 +285,19 @@ int main(int argc, char **argv) {
 		createClockLabel(compo,i, labels[i]);
 		createClockWidgets(compo, &clockDigits[i], i);
 	}
-    digitStruct.numClocks = numClocks;
-	digitStruct.clockDigits = malloc(sizeof(ClockDigitsStruct)*numClocks);
+    clocksStruct.numClocks = numClocks;
+	clocksStruct.clockDigits = malloc(sizeof(ClockDigitsStruct)*numClocks);
     for (i=0; i<numClocks; i++) {
-		digitStruct.clockDigits[i] = clockDigits[i];
+		clocksStruct.clockDigits[i] = clockDigits[i];
 	}
 
     XtRealizeWidget(toplevel);
 
     /* init clock display */
-	TimeoutCB( (XtPointer)&digitStruct, NULL );
+	TimeoutCB( (XtPointer)&clocksStruct, NULL );
 
 	/* add time out */
-	XtAddTimeOut( TIMEOUT, TimeoutCB, &digitStruct );
+	XtAddTimeOut( TIMEOUT, TimeoutCB, &clocksStruct );
 
     XtMainLoop();
 }
