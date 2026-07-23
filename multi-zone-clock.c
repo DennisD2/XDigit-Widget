@@ -29,7 +29,7 @@ typedef struct _ClockDigitsStruct {
 } ClockDigitsStruct;
 
 // all clocks, additional number of clocks
-typedef struct _DigitStruct {
+typedef struct _ClocksStruct {
 	int numClocks;
 	ClockDigitsStruct *clockDigits;
 } ClocksStruct;
