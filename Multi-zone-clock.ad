@@ -1,0 +1,11 @@
+multi-zone-clock*Digit.value: 0
+multi-zone-clock*Digit.showDecimalPoint: False
+multi-zone-clock*Digit.background: black
+multi-zone-clock*Digit.foreground: green
+
+multi-zone-clock*clockPanel.background: black
+
+multi-zone-clock*clockTitle.background: black
+multi-zone-clock.clockPanel.clockTitle.foreground: red
+
+multi-zone-clock.labels: Frankfurt,GMT,Yolo

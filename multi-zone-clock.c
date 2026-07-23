@@ -1,9 +1,8 @@
 /*************************************************************
  * multi-zone-clock.c : multi-zone digital clock
- * Currently, "multi" means 2 zones: local time and GMT time
  *************************************************************/
 
-#define NUM_CLOCKS 3
+#define MAX_CLOCKS 10
 
 #define TIME_LOCAL 0
 #define TIME_GMT 1
@@ -24,22 +23,34 @@
 #include <stdio.h>
 #include <ctype.h>
 
-char *clockTitle[NUM_CLOCKS] = { "Frankfurt", "GMT", "New York"};
+// 5 digits per clock
+typedef struct _ClockDigitsStruct {
+	Widget digit[5];
+} ClockDigitsStruct;
+
+// all clocks, additional number of clocks
+typedef struct _DigitStruct {
+	int numClocks;
+	ClockDigitsStruct *clockDigits;
+} DigitStruct;
+
+DigitStruct digitStruct;
 
 /*
  * Set all widgets value resouce to digit values defined by values array
  */
-void setClocksValue(Widget *digit[5], int values[4]) {
+void setClocksValue(Widget digit[], int values[4]) {
 	Arg args[1];
 
+	printf("%d %d %d %d\n", values[0], values[1], values[2], values[3]);
 	XtSetArg(args[0], XtNvalue, values[0]);
-	XtSetValues( *digit[0], args, 1 );
+	XtSetValues( digit[0], args, 1 );
 	XtSetArg(args[0], XtNvalue, values[1]);
-	XtSetValues( *digit[1], args, 1 );
+	XtSetValues( digit[1], args, 1 );
 	XtSetArg( args[0], XtNvalue, values[2]);
-	XtSetValues( *digit[3], args, 1 );
+	XtSetValues( digit[3], args, 1 );
 	XtSetArg( args[0], XtNvalue, values[3]);
-	XtSetValues( *digit[4], args, 1 );
+	XtSetValues( digit[4], args, 1 );
 }
 
 /*
@@ -92,10 +103,15 @@ void change_hours(int * v, int i) {
  * Timeout callback
  */
 void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
-	Widget **digit = (Widget**)client_data;
-
+	DigitStruct *clockDigits  = (DigitStruct *)client_data;
 	int num_values[4];
 
+	int i;
+	for (i=0; i<clockDigits->numClocks; i++) {
+		getCurrentTime((int*)num_values, TIME_LOCAL);
+		setClocksValue(clockDigits->clockDigits[i].digit, num_values);
+	}
+	/*
 	getCurrentTime((int*)num_values, TIME_LOCAL);
 	setClocksValue(digit, num_values);
 
@@ -104,16 +120,16 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 
 	getCurrentTime((int*)num_values, TIME_GMT);
 	change_hours( num_values, -4);
-
 	setClocksValue(&digit[10], num_values);
+	*/
 
 	/*
 	 * start time out from the beginning 
 	 */
-	XtAddTimeOut( TIMEOUT, TimeoutCB, digit );
+	XtAddTimeOut( TIMEOUT, TimeoutCB, &digitStruct );
 }
 
-void createClockWidgets(Widget compo, Widget digit[], int row) {
+void createClockWidgets(Widget compo, ClockDigitsStruct *clockDigits, int row) {
 	int n,i;
 	Arg args[8];
 	for ( i=0; i<5; i++ ) {
@@ -126,7 +142,7 @@ void createClockWidgets(Widget compo, Widget digit[], int row) {
 		else
 			XtSetArg( args[n], XtNvalue, i );
 		n++;
-		digit[i] = XtCreateManagedWidget("digit", XddigitWidgetClass,
+		clockDigits->digit[i] = XtCreateManagedWidget("digit", XddigitWidgetClass,
 		                                    compo, args, n);
 	}
 }
@@ -136,6 +152,7 @@ XmFontList the_font_list;
 typedef struct _Resources {
 	Pixel foreground;
 	Pixel background;
+	String labels;
 	/*XFontStruct *fontStruct; */
 } Resources;
 
@@ -148,10 +165,12 @@ static XtResource resourceSpec[] = {
 	{ XtNbackground, XtCBackground, XtRPixel, sizeof(Pixel),
 	  XtOffsetOf(Resources, background),
 	  XtRString, "XtDefaultBackground"},
+	{ "labels", "Labels", XtRString, sizeof(String),
+	XtOffsetOf(Resources, labels),
+	XtRString, "local"},
 	/*{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
 		XtOffsetOf(Resources, fontStruct),
 		XtRString, "XtDefaultFont"},*/
-
 };
 
 void createClockLabel(Widget compo, int numClock, char* title) {
@@ -162,14 +181,34 @@ void createClockLabel(Widget compo, int numClock, char* title) {
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
 	XtSetArg( wargs[n], XtNx, (Position)10 + 5*60 + 5); n++;
 	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
-	//XtSetArg( wargs[n], XtNforeground, theResources.foreground /*XtDefaultForeground*/ ); n++;
-	//XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 	XtSetArg( wargs[n], XmNfontList, the_font_list ); n++;
 	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 }
 
+/**
+ *
+ * @param labelString string like "Frankfurt,GMT,New York"
+ * @param labels Array of strings created from labelString by splitting at delimiter ','
+ * @return number of strings read
+ */
+int readClockLabels(String labelString, String *labels) {
+	//printf("%s\n", theResources.labels );
+	int i=0;
+	String token = strtok(theResources.labels,",");
+	labels[i] = token;
+	while (token != NULL) {
+		labels[i++] = token;
+		token = strtok(NULL, ",");
+	}
+	//int n=i;
+	//for (i=0; i<n; i++) {
+	//	printf("%s\n", labels[i] );
+	//}
+	return i;
+}
+
 int main(int argc, char **argv) {
-    Widget toplevel, compo, digit[NUM_CLOCKS][5];
+    Widget toplevel, compo;
     Arg args[8]; int n, i;
 
     /*
@@ -180,6 +219,14 @@ int main(int argc, char **argv) {
 	/* get apps resources for use in createClockLabel() */
 	XtGetApplicationResources(toplevel, &theResources,
 						   resourceSpec, XtNumber(resourceSpec), NULL, 0);
+
+	String labels[MAX_CLOCKS];
+	int numClocks = readClockLabels(theResources.labels, labels);
+	if (numClocks > MAX_CLOCKS) {
+		printf("Too many clocks defined!\n");
+	} else {
+		printf("%d clocks defined\n", numClocks);
+	}
 
 	Display *display = XtDisplay(toplevel);
 /*
@@ -226,24 +273,31 @@ int main(int argc, char **argv) {
      */
     n=0;
     XtSetArg( args[n], XtNwidth, (Dimension)500 ); n++;
-    XtSetArg( args[n], XtNheight, (Dimension)NUM_CLOCKS*100 ); n++;
+    XtSetArg( args[n], XtNheight, (Dimension)numClocks*100 ); n++;
     compo = XtCreateManagedWidget("clockPanel", compositeWidgetClass,
 	toplevel, args, n);
 
 	/*
      * Create all digit widgets
      */
-	for ( i=0; i<NUM_CLOCKS; i++ ) {
-		createClockLabel(compo,i, clockTitle[i]);
-		createClockWidgets(compo, digit[i], i);
+	ClockDigitsStruct *clockDigits = malloc (sizeof(ClockDigitsStruct)*numClocks);
+	for ( i=0; i<numClocks; i++ ) {
+		createClockLabel(compo,i, labels[i]);
+		createClockWidgets(compo, &clockDigits[i], i);
 	}
+    digitStruct.numClocks = numClocks;
+	digitStruct.clockDigits = malloc(sizeof(ClockDigitsStruct)*numClocks);
+    for (i=0; i<numClocks; i++) {
+		digitStruct.clockDigits[i] = clockDigits[i];
+	}
+
     XtRealizeWidget(toplevel);
 
     /* init clock display */
-	TimeoutCB( (XtPointer)digit, NULL );
+	TimeoutCB( (XtPointer)&digitStruct, NULL );
 
 	/* add time out */
-	XtAddTimeOut( TIMEOUT, TimeoutCB, digit );
+	XtAddTimeOut( TIMEOUT, TimeoutCB, &digitStruct );
 
     XtMainLoop();
 }
