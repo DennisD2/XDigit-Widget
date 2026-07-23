@@ -192,7 +192,6 @@ void createClockLabel(Widget compo, int numClock, char* title) {
  * @return number of strings read
  */
 int readClockLabels(String labelString, String *labels) {
-	//printf("%s\n", theResources.labels );
 	int i=0;
 	String token = strtok(theResources.labels,",");
 	labels[i] = token;
@@ -200,10 +199,6 @@ int readClockLabels(String labelString, String *labels) {
 		labels[i++] = token;
 		token = strtok(NULL, ",");
 	}
-	//int n=i;
-	//for (i=0; i<n; i++) {
-	//	printf("%s\n", labels[i] );
-	//}
 	return i;
 }
 
@@ -211,12 +206,10 @@ int main(int argc, char **argv) {
     Widget toplevel, compo;
     Arg args[8]; int n, i;
 
-    /*
-     * Initialize the Intrinsics.
-     */   
+    /* Initialize the Intrinsics */
     toplevel = XtInitialize(argv[0], "MultiZoneClock", NULL,
                             0, &argc, argv);
-	/* get apps resources for use in createClockLabel() */
+	/* Read app resources */
 	XtGetApplicationResources(toplevel, &theResources,
 						   resourceSpec, XtNumber(resourceSpec), NULL, 0);
 
