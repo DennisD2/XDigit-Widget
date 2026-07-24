@@ -194,7 +194,7 @@ static void createClockLabelWidget(Widget compo, int numClock, char* title) {
 
 /**
  *
- * @param labelString string like "Frankfurt,GMT,New York"
+ * @param labelString string like "Frankfurt=Local,GMT,New York=-4"
  * @param labels Array of strings created from labelString by splitting at delimiter ','
  * @return number of strings read
  */
@@ -209,6 +209,12 @@ static int readClockInfos(String labelString, String *labels) {
 	return i;
 }
 
+/**
+ *
+ * @param info input string like "Yolo=-4"
+ * @param parts Array of strings created from labelString by splitting at delimiter '='
+ * @return number of strings read (correct is 1 or 2)
+ */
 static int splitInfo(String info, String *parts) {
 	int i=0;
 	String token = strtok(info,"=");
