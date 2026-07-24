@@ -104,8 +104,15 @@ static void setClockValue(ClockStruct *clock) {
 		change_hours(values, offset);
 	}
 
-	XtSetArg(args[0], XtNvalue, values[0]);
-	XtSetValues( clock->digit[0], args, 1 );
+	if (values[0] == 0) {
+		XtSetArg(args[0], XtNvalue, NO_VALUE);
+		XtSetValues( clock->digit[0], args, 1 );
+	}
+	if (values[0] != 0) {
+		XtSetArg(args[0], XtNvalue, values[0]);
+		XtSetValues( clock->digit[0], args, 1 );
+	}
+
 	XtSetArg(args[0], XtNvalue, values[1]);
 	XtSetValues( clock->digit[1], args, 1 );
 	XtSetArg( args[0], XtNvalue, values[2]);
@@ -253,7 +260,7 @@ int main(int argc, char **argv) {
 			clocksStruct.clocks[i].gmtOffset = atoi(infoParts[1]);
 		}
 		//printf("GMT Offset: %d\n", clocksStruct.clocks[i].gmtOffset);
-	}K
+	}
 	Display *display = XtDisplay(toplevel);
 /*
     For pure (non-Motif) we would do it like this:

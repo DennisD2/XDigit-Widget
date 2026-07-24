@@ -25,6 +25,7 @@ extern Widget XtCreateDigit( Widget parent, char *name, ArgList args, int ArgCou
 #define MINUS_VALUE -1
 #define DECPOINT_VALUE -2
 #define DOUBLEPOINT_VALUE -3
+#define NO_VALUE -4
 
 #endif /*DIGIT_H*/
 

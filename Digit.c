@@ -172,7 +172,7 @@ static Boolean SetValues (XdDigitWidget current, XdDigitWidget request, XdDigitW
   /*
    * Make sure the new dial values are reasonable.
    */
-  if (new->digit.value<-3 || new->digit.value>9 ) {
+  if (new->digit.value<-4 || new->digit.value>9 ) {
 		XtWarning("Digit value out of range" );
 		new->digit.value=0;
   }
@@ -223,7 +223,8 @@ static void DrawValue(  XdDigitWidget w, int new, int old ) {
        /* the more special ones - "value" is negative" */
       case MINUS_VALUE      : s[4]=1; break;
       case DECPOINT_VALUE   : break;
-      case DOUBLEPOINT_VALUE: s[9]=s[10]=1; break; 
+      case DOUBLEPOINT_VALUE: s[9]=s[10]=1; break;
+      case NO_VALUE: return;
     }
     for (i=1;i<11;i++) {
       if (s[i])
