@@ -86,7 +86,7 @@ static void change_hours(int * v, int i) {
 }
 
 /*
- * Set all widgets value resouce to digit values defined by values array
+ * Set all widgets value resources to digit values defined by values array
  */
 static void setClockValue(ClockStruct *clock) {
 	Arg args[1];
@@ -94,7 +94,7 @@ static void setClockValue(ClockStruct *clock) {
 
 	int zone = TIME_GMT;
 	int offset = 0;
-	if (clock->gmtOffset==TIME_LOCAL_ID) {
+	if (clock->gmtOffset == TIME_LOCAL_ID) {
 		zone = TIME_LOCAL;
 	} else {
 		offset = clock->gmtOffset;
@@ -239,7 +239,7 @@ int main(int argc, char **argv) {
 		infoParts[0] = "?"; infoParts[1]="?";
 		int n = splitInfo(labels[i], infoParts);
 		if (n>2) {
-			printf("Strange clock info (%d)!\n", n);
+			printf("Strange clock info (%s)!\n", labels[i]);
 		}
 		clocksStruct.clocks[i].label = infoParts[0];
 		printf("%s %s\n", infoParts[0], infoParts[1]);
