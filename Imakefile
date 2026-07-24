@@ -7,6 +7,7 @@ CCOPTIONS       =-Wall
 LDOPTIONS       = -L.
 LOCAL_LIBRARIES = -lWidgets -lXm
 #  EXTRA_DEFINES =
+EXTENSIONLIB     =
 #DEPLIBS         = $(DEPXLIB)
 #SYS_LIBRARIES   +=
 
