@@ -23,35 +23,21 @@
 #include <stdio.h>
 #include <ctype.h>
 
-// 5 digits per clock
-typedef struct _ClockDigitsStruct {
-	Widget digit[5];
-} ClockDigitsStruct;
+// Clock struct
+typedef struct _ClockStruct {
+	String label;
+	int gmtOffset;
+	Widget digit[5]; //  5 digits per clock
+} ClockStruct;
 
 // all clocks, additional number of clocks
 typedef struct _ClocksStruct {
 	int numClocks;
-	ClockDigitsStruct *clockDigits;
+
+	ClockStruct *clocks;
 } ClocksStruct;
 
 ClocksStruct clocksStruct;
-
-/*
- * Set all widgets value resouce to digit values defined by values array
- */
-void setClocksValue(Widget digit[], int values[4]) {
-	Arg args[1];
-
-	printf("%d %d %d %d\n", values[0], values[1], values[2], values[3]);
-	XtSetArg(args[0], XtNvalue, values[0]);
-	XtSetValues( digit[0], args, 1 );
-	XtSetArg(args[0], XtNvalue, values[1]);
-	XtSetValues( digit[1], args, 1 );
-	XtSetArg( args[0], XtNvalue, values[2]);
-	XtSetValues( digit[3], args, 1 );
-	XtSetArg( args[0], XtNvalue, values[3]);
-	XtSetValues( digit[4], args, 1 );
-}
 
 /*
  * Get time and convert to values suitable for the Digit widgets.
@@ -89,6 +75,7 @@ void getCurrentTime(int num_values[4], int time_zone) {
 	}
 }
 
+
 /*
  * Remove/add some integer offset to a 24 hour value in v[] array
  */
@@ -100,16 +87,38 @@ void change_hours(int * v, int i) {
 }
 
 /*
+ * Set all widgets value resouce to digit values defined by values array
+ */
+void setClockValue(ClockStruct *clock) {
+	Arg args[1];
+	int values[4];
+
+	int zone = TIME_LOCAL;
+	if (strcmp(clock->label,"GMT")==0) {
+		zone = TIME_GMT;
+	}
+	getCurrentTime(values, zone);
+
+	printf("%d %d %d %d\n", values[0], values[1], values[2], values[3]);
+	XtSetArg(args[0], XtNvalue, values[0]);
+	XtSetValues( clock->digit[0], args, 1 );
+	XtSetArg(args[0], XtNvalue, values[1]);
+	XtSetValues( clock->digit[1], args, 1 );
+	XtSetArg( args[0], XtNvalue, values[2]);
+	XtSetValues( clock->digit[3], args, 1 );
+	XtSetArg( args[0], XtNvalue, values[3]);
+	XtSetValues( clock->digit[4], args, 1 );
+}
+
+/*
  * Timeout callback
  */
 void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	ClocksStruct *clockStruct  = (ClocksStruct *)client_data;
-	int num_values[4];
 
 	int i;
 	for (i=0; i<clockStruct->numClocks; i++) {
-		getCurrentTime((int*)num_values, TIME_LOCAL);
-		setClocksValue(clockStruct->clockDigits[i].digit, num_values);
+		setClockValue(&clockStruct->clocks[i]);
 	}
 	/*
 	getCurrentTime((int*)num_values, TIME_LOCAL);
@@ -129,7 +138,7 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	XtAddTimeOut( TIMEOUT, TimeoutCB, clockStruct );
 }
 
-void createClockWidgets(Widget compo, ClockDigitsStruct *clockDigits, int row) {
+void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) {
 	int n,i;
 	Arg args[8];
 	for ( i=0; i<5; i++ ) {
@@ -165,7 +174,7 @@ static XtResource resourceSpec[] = {
 	{ XtNbackground, XtCBackground, XtRPixel, sizeof(Pixel),
 	  XtOffsetOf(Resources, background),
 	  XtRString, "XtDefaultBackground"},
-	{ "labels", "Labels", XtRString, sizeof(String),
+	{ "clocks", "Clocks", XtRString, sizeof(String),
 	XtOffsetOf(Resources, labels),
 	XtRString, "local"},
 	/*{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
@@ -173,7 +182,7 @@ static XtResource resourceSpec[] = {
 		XtRString, "XtDefaultFont"},*/
 };
 
-void createClockLabel(Widget compo, int numClock, char* title) {
+void createClockLabelWidget(Widget compo, int numClock, char* title) {
 	Arg wargs[7];
 	int n=0;
 
@@ -191,7 +200,7 @@ void createClockLabel(Widget compo, int numClock, char* title) {
  * @param labels Array of strings created from labelString by splitting at delimiter ','
  * @return number of strings read
  */
-int readClockLabels(String labelString, String *labels) {
+int readClockInfos(String labelString, String *labels) {
 	int i=0;
 	String token = strtok(theResources.labels,",");
 	labels[i] = token;
@@ -214,13 +223,18 @@ int main(int argc, char **argv) {
 						   resourceSpec, XtNumber(resourceSpec), NULL, 0);
 
 	String labels[MAX_CLOCKS];
-	int numClocks = readClockLabels(theResources.labels, labels);
+	int numClocks = readClockInfos(theResources.labels, labels);
 	if (numClocks > MAX_CLOCKS) {
 		printf("Too many clocks defined!\n");
+		numClocks = MAX_CLOCKS;
 	} else {
 		printf("%d clocks defined\n", numClocks);
 	}
-
+    clocksStruct.numClocks = numClocks;
+    clocksStruct.clocks = malloc(sizeof(ClockStruct)*numClocks);
+	for (i=0; i<numClocks; i++) {
+		clocksStruct.clocks[i].label = labels[i];
+	}
 	Display *display = XtDisplay(toplevel);
 /*
     For pure (non-Motif) we would do it like this:
@@ -273,15 +287,9 @@ int main(int argc, char **argv) {
 	/*
      * Create all digit widgets
      */
-	ClockDigitsStruct *clockDigits = malloc (sizeof(ClockDigitsStruct)*numClocks);
 	for ( i=0; i<numClocks; i++ ) {
-		createClockLabel(compo,i, labels[i]);
-		createClockWidgets(compo, &clockDigits[i], i);
-	}
-    clocksStruct.numClocks = numClocks;
-	clocksStruct.clockDigits = malloc(sizeof(ClockDigitsStruct)*numClocks);
-    for (i=0; i<numClocks; i++) {
-		clocksStruct.clockDigits[i] = clockDigits[i];
+		createClockLabelWidget(compo,i, labels[i]);
+		createClockWidgets(compo, &clocksStruct.clocks[i], i);
 	}
 
     XtRealizeWidget(toplevel);
