@@ -6,7 +6,7 @@
 
 #define TIME_LOCAL 0
 #define TIME_GMT 1
-#define TIME_NEW_YORK 2
+#define TIME_LOCAL_ID 123
 
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h> 
@@ -92,11 +92,17 @@ static void setClockValue(ClockStruct *clock) {
 	Arg args[1];
 	int values[4];
 
-	int zone = TIME_LOCAL;
-	if (strcmp(clock->label,"GMT")==0) {
-		zone = TIME_GMT;
+	int zone = TIME_GMT;
+	int offset = 0;
+	if (clock->gmtOffset==TIME_LOCAL_ID) {
+		zone = TIME_LOCAL;
+	} else {
+		offset = clock->gmtOffset;
 	}
 	getCurrentTime(values, zone);
+	if (offset != 0) {
+		change_hours(values, offset);
+	}
 
 	printf("%d %d %d %d\n", values[0], values[1], values[2], values[3]);
 	XtSetArg(args[0], XtNvalue, values[0]);
@@ -235,7 +241,9 @@ int main(int argc, char **argv) {
 			printf("Strange clock info (%d)!\n", n);
 		}
 		clocksStruct.clocks[i].label = infoParts[0];
-		if (infoParts[0]=="Local" || infoParts[0]=="GMT") {
+		if (infoParts[0]=="Local") {
+			clocksStruct.clocks[i].gmtOffset = TIME_LOCAL_ID;
+		} else if (infoParts[0]=="GMT") {
 			clocksStruct.clocks[i].gmtOffset = 0;
 		} else {
 			clocksStruct.clocks[i].gmtOffset = atoi(infoParts[1]);
