@@ -253,7 +253,7 @@ int main(int argc, char **argv) {
 			clocksStruct.clocks[i].gmtOffset = atoi(infoParts[1]);
 		}
 		//printf("GMT Offset: %d\n", clocksStruct.clocks[i].gmtOffset);
-	}
+	}K
 	Display *display = XtDisplay(toplevel);
 /*
     For pure (non-Motif) we would do it like this:

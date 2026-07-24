@@ -5,8 +5,7 @@ There is a test program called "xdigits" which uses 5 of these widgets to implem
 a simple digital clock.
 
 There is another test program called "multi-zone-clock" which shows time values for
-multiple time zones. Currently, "multi" means 3, showing local time and GMT time, and New York Time (just because
-I needed these three times).
+multiple time zones. 
 
 This code uses Xt, XLib and OSF/Motif library, which should be contained or at least installable via package
 from common Linux installations. These libraries are very old, and they will work even on Retro hardware (like
@@ -53,15 +52,20 @@ xrdb --query
 xrdb --merge Digit.ad
 ```
 
-Example content of Digit.ad:
+Example content of Multi-zone-clock.ad:
 ```shell
-*clockPanel.background: black
-*digit.value: 0
-*digit.showDecimalPoint: False
-*digit.background: black
-*digit.foreground: green
-*clockTitle.background: black
-*clockTitle.foreground: red
+multi-zone-clock*Digit.value: 0
+multi-zone-clock*Digit.showDecimalPoint: False
+multi-zone-clock*Digit.background: black
+multi-zone-clock*Digit.foreground: green
+
+multi-zone-clock*clockPanel.background: black
+
+multi-zone-clock*clockTitle.background: black
+multi-zone-clock.clockPanel.clockTitle.foreground: red
+
+multi-zone-clock.clocks: Frankfurt=Local,GMT=GMT,New York=-4
+
 ```
 
 Example result:
