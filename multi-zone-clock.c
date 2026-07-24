@@ -24,20 +24,20 @@
 #include <ctype.h>
 
 // Clock struct
-typedef struct _ClockStruct {
+typedef struct {
 	String label;
 	int gmtOffset;
 	Widget digit[5]; //  5 digits per clock
 } ClockStruct;
 
 // all clocks, additional number of clocks
-typedef struct _ClocksStruct {
+typedef struct {
 	int numClocks;
 
 	ClockStruct *clocks;
 } ClocksStruct;
 
-ClocksStruct clocksStruct;
+static ClocksStruct clocksStruct;
 
 /*
  * Get time and convert to values suitable for the Digit widgets.
