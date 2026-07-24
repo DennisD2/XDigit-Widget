@@ -25,15 +25,14 @@
 
 // Clock struct
 typedef struct {
-	String label;
-	int gmtOffset;
+	String label; // Label for this clock
+	int gmtOffset; // Offset to GMT time
 	Widget digit[5]; //  5 digits per clock
 } ClockStruct;
 
 // all clocks, additional number of clocks
 typedef struct {
 	int numClocks;
-
 	ClockStruct *clocks;
 } ClocksStruct;
 
