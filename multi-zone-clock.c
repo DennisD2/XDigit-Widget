@@ -197,6 +197,17 @@ static int readClockInfos(String labelString, String *labels) {
 	return i;
 }
 
+static int splitInfo(String info, String *parts) {
+	int i=0;
+	String token = strtok(info,"=");
+	parts[i] = token;
+	while (token != NULL) {
+		parts[i++] = token;
+		token = strtok(NULL, "=");
+	}
+	return i;
+}
+
 int main(int argc, char **argv) {
 	Arg args[8]; int i;
 
@@ -218,7 +229,18 @@ int main(int argc, char **argv) {
     clocksStruct.numClocks = numClocks;
     clocksStruct.clocks = malloc(sizeof(ClockStruct)*numClocks);
 	for (i=0; i<numClocks; i++) {
-		clocksStruct.clocks[i].label = labels[i];
+		String infoParts[2];
+		int n = splitInfo(labels[i], infoParts);
+		if (n>2) {
+			printf("Strange clock info (%d)!\n", n);
+		}
+		clocksStruct.clocks[i].label = infoParts[0];
+		if (infoParts[0]=="Local" || infoParts[0]=="GMT") {
+			clocksStruct.clocks[i].gmtOffset = 0;
+		} else {
+			clocksStruct.clocks[i].gmtOffset = atoi(infoParts[1]);
+		}
+		printf("GMT Offset: %d\n", clocksStruct.clocks[i].gmtOffset);
 	}
 	Display *display = XtDisplay(toplevel);
 /*
