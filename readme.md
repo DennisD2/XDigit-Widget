@@ -85,6 +85,7 @@ the displayed number, except the following values:
 * MINUS_VALUE : minus (segment 4)
 * DECPOINT_VALUE : decimal point only (segment 8)
 * DOUBLEPOINT_VALUE : double point (segments 9,10)
+* NO_VALUE : no segments and no decimal point are displayed
 
 A number is displayed by drawing all required segments for that number.
 Segment indices:
