@@ -236,14 +236,16 @@ int main(int argc, char **argv) {
     clocksStruct.clocks = malloc(sizeof(ClockStruct)*numClocks);
 	for (i=0; i<numClocks; i++) {
 		String infoParts[2];
+		infoParts[0] = "?"; infoParts[1]="?";
 		int n = splitInfo(labels[i], infoParts);
 		if (n>2) {
 			printf("Strange clock info (%d)!\n", n);
 		}
 		clocksStruct.clocks[i].label = infoParts[0];
-		if (infoParts[0]=="Local") {
+		printf("%s %s\n", infoParts[0], infoParts[1]);
+		if (strcmp(infoParts[1], "Local")==0) {
 			clocksStruct.clocks[i].gmtOffset = TIME_LOCAL_ID;
-		} else if (infoParts[0]=="GMT") {
+		} else if (strcmp(infoParts[0], "GMT")==0) {
 			clocksStruct.clocks[i].gmtOffset = 0;
 		} else {
 			clocksStruct.clocks[i].gmtOffset = atoi(infoParts[1]);
