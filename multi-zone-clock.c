@@ -78,9 +78,9 @@ static void getCurrentTime(int num_values[4], int time_zone) {
 /*
  * Remove/add some integer offset to a 24 hour value in v[] array
  */
-static void change_hours(int * v, int i) {
+static void change_hours(int * v, int offset) {
 	int h = v[0]*10 + v[1];
-	h += i % 24;
+	h += offset % 24;
 	v[0] = h/10;
 	v[1] = h%10;
 }
