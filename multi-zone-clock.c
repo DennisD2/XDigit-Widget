@@ -43,7 +43,7 @@ ClocksStruct clocksStruct;
  * Get time and convert to values suitable for the Digit widgets.
  * Can return local time of GMT time, depending on time_zone value.
  */
-void getCurrentTime(int num_values[4], int time_zone) {
+static void getCurrentTime(int num_values[4], int time_zone) {
 	char *p, values[4][2];
 	int i;
 	time_t t;
@@ -79,7 +79,7 @@ void getCurrentTime(int num_values[4], int time_zone) {
 /*
  * Remove/add some integer offset to a 24 hour value in v[] array
  */
-void change_hours(int * v, int i) {
+static void change_hours(int * v, int i) {
 	int h = v[0]*10 + v[1];
 	h += i % 24;
 	v[0] = h/10;
@@ -89,7 +89,7 @@ void change_hours(int * v, int i) {
 /*
  * Set all widgets value resouce to digit values defined by values array
  */
-void setClockValue(ClockStruct *clock) {
+static void setClockValue(ClockStruct *clock) {
 	Arg args[1];
 	int values[4];
 
@@ -113,7 +113,7 @@ void setClockValue(ClockStruct *clock) {
 /*
  * Timeout callback
  */
-void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
+static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	ClocksStruct *clockStruct  = (ClocksStruct *)client_data;
 
 	int i;
@@ -138,7 +138,7 @@ void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	XtAddTimeOut( TIMEOUT, TimeoutCB, clockStruct );
 }
 
-void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) {
+static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) {
 	int n,i;
 	Arg args[8];
 	for ( i=0; i<5; i++ ) {
@@ -182,7 +182,7 @@ static XtResource resourceSpec[] = {
 		XtRString, "XtDefaultFont"},*/
 };
 
-void createClockLabelWidget(Widget compo, int numClock, char* title) {
+static void createClockLabelWidget(Widget compo, int numClock, char* title) {
 	Arg wargs[7];
 	int n=0;
 
@@ -200,7 +200,7 @@ void createClockLabelWidget(Widget compo, int numClock, char* title) {
  * @param labels Array of strings created from labelString by splitting at delimiter ','
  * @return number of strings read
  */
-int readClockInfos(String labelString, String *labels) {
+static int readClockInfos(String labelString, String *labels) {
 	int i=0;
 	String token = strtok(theResources.labels,",");
 	labels[i] = token;
