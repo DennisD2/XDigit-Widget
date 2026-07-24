@@ -115,21 +115,9 @@ static void setClockValue(ClockStruct *clock) {
 static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	ClocksStruct *clockStruct  = (ClocksStruct *)client_data;
 
-	int i;
-	for (i=0; i<clockStruct->numClocks; i++) {
+	for (int i=0; i<clockStruct->numClocks; i++) {
 		setClockValue(&clockStruct->clocks[i]);
 	}
-	/*
-	getCurrentTime((int*)num_values, TIME_LOCAL);
-	setClocksValue(digit, num_values);
-
-	getCurrentTime((int*)num_values, TIME_GMT);
-	setClocksValue(&digit[5], num_values);
-
-	getCurrentTime((int*)num_values, TIME_GMT);
-	change_hours( num_values, -4);
-	setClocksValue(&digit[10], num_values);
-	*/
 
 	/*
 	 * start time out from the beginning 
@@ -138,10 +126,9 @@ static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 }
 
 static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) {
-	int n,i;
 	Arg args[8];
-	for ( i=0; i<5; i++ ) {
-		n=0;
+	for ( int i=0; i<5; i++ ) {
+		int n=0;
 		XtSetArg( args[n], XtNx, (Position)i*60 ); n++;
 		XtSetArg( args[n], XtNy, (Position)row*100 ); n++;
 		XtSetArg( args[n], XtNwidth, (Dimension)60 ); n++;
@@ -157,7 +144,7 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
 
 XmFontList the_font_list;
 
-typedef struct _Resources {
+typedef struct {
 	Pixel foreground;
 	Pixel background;
 	String labels;
@@ -211,12 +198,11 @@ static int readClockInfos(String labelString, String *labels) {
 }
 
 int main(int argc, char **argv) {
-    Widget toplevel, compo;
-    Arg args[8]; int n, i;
+	Arg args[8]; int i;
 
     /* Initialize the Intrinsics */
-    toplevel = XtInitialize(argv[0], "MultiZoneClock", NULL,
-                            0, &argc, argv);
+    Widget toplevel = XtInitialize(argv[0], "MultiZoneClock", NULL,
+                                   0, &argc, argv);
 	/* Read app resources */
 	XtGetApplicationResources(toplevel, &theResources,
 						   resourceSpec, XtNumber(resourceSpec), NULL, 0);
@@ -277,11 +263,11 @@ int main(int argc, char **argv) {
     /*
      * Create a container widget for all the digits
      */
-    n=0;
+    int n = 0;
     XtSetArg( args[n], XtNwidth, (Dimension)500 ); n++;
     XtSetArg( args[n], XtNheight, (Dimension)numClocks*100 ); n++;
-    compo = XtCreateManagedWidget("clockPanel", compositeWidgetClass,
-	toplevel, args, n);
+    Widget compo = XtCreateManagedWidget("clockPanel", compositeWidgetClass,
+                                         toplevel, args, n);
 
 	/*
      * Create all digit widgets
