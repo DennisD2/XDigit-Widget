@@ -43,7 +43,7 @@ static ClocksStruct clocksStruct;
  * Can return local time of GMT time, depending on time_zone value.
  */
 static void getCurrentTime(int num_values[4], int time_zone) {
-	char *p, values[4][2];
+	char values[4][2];
 	int i;
 	time_t t;
 
@@ -61,7 +61,7 @@ static void getCurrentTime(int num_values[4], int time_zone) {
 	char *buf = asctime(tt);
 	//printf("time: %s\n", buf);
 
-	p=buf;
+	char *p=buf;
 	while (!isdigit(*p)) p++;
 	while (isdigit(*p)) p++;
 	while (!isdigit(*p)) p++;
@@ -88,7 +88,7 @@ static void change_hours(int * v, int offset) {
 /*
  * Set all widgets value resources to digit values defined by values array
  */
-static void setClockValue(ClockStruct *clock) {
+static void setClockValue(const ClockStruct *clock) {
 	Arg args[1];
 	int values[4];
 
@@ -154,7 +154,7 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
 	}
 }
 
-XmFontList the_font_list;
+static XmFontList the_font_list;
 
 typedef struct {
 	Pixel foreground;
