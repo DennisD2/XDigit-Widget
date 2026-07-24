@@ -104,7 +104,6 @@ static void setClockValue(ClockStruct *clock) {
 		change_hours(values, offset);
 	}
 
-	printf("%d %d %d %d\n", values[0], values[1], values[2], values[3]);
 	XtSetArg(args[0], XtNvalue, values[0]);
 	XtSetValues( clock->digit[0], args, 1 );
 	XtSetArg(args[0], XtNvalue, values[1]);
@@ -232,25 +231,28 @@ int main(int argc, char **argv) {
 	} else {
 		printf("%d clocks defined\n", numClocks);
 	}
+
     clocksStruct.numClocks = numClocks;
     clocksStruct.clocks = malloc(sizeof(ClockStruct)*numClocks);
 	for (i=0; i<numClocks; i++) {
 		String infoParts[2];
 		infoParts[0] = "?"; infoParts[1]="?";
 		int n = splitInfo(labels[i], infoParts);
-		if (n>2) {
+		if (n > 2) {
 			printf("Strange clock info (%s)!\n", labels[i]);
 		}
 		clocksStruct.clocks[i].label = infoParts[0];
-		printf("%s %s\n", infoParts[0], infoParts[1]);
-		if (strcmp(infoParts[1], "Local")==0) {
+		// calculate hours offset
+		if (strcmp(infoParts[1], "Local") == 0) {
+			// No offset for local time
 			clocksStruct.clocks[i].gmtOffset = TIME_LOCAL_ID;
-		} else if (strcmp(infoParts[0], "GMT")==0) {
+		} else if (strcmp(infoParts[0], "GMT") == 0) {
+			// No offset for GMT
 			clocksStruct.clocks[i].gmtOffset = 0;
 		} else {
 			clocksStruct.clocks[i].gmtOffset = atoi(infoParts[1]);
 		}
-		printf("GMT Offset: %d\n", clocksStruct.clocks[i].gmtOffset);
+		//printf("GMT Offset: %d\n", clocksStruct.clocks[i].gmtOffset);
 	}
 	Display *display = XtDisplay(toplevel);
 /*
