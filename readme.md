@@ -45,14 +45,25 @@ The multi-zone-clock looks like this:
 For pretty colors see below in resources section.
 
 ## Load resources with xrdb
+Use xrdb command to manipulate X Window resources:
 ```shell
 # list existing definitions
 xrdb --query
-# add local ressources
+# add local resources
 xrdb --merge Digit.ad
+xrdb --merge Multi-zone-clock.ad
 ```
-
-Example content of Multi-zone-clock.ad:
+Example content of Digit.ad file:
+```shell
+*clockPanel.background: black
+*digit.value: 0
+*digit.showDecimalPoint: False
+*digit.background: black
+*digit.foreground: green
+*clockTitle.background: black
+*clockTitle.foreground: red
+```
+Example content of Multi-zone-clock.ad file:
 ```shell
 multi-zone-clock*Digit.value: 0
 multi-zone-clock*Digit.showDecimalPoint: False

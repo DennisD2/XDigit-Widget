@@ -47,11 +47,11 @@ static void getCurrentTime(int num_values[4], String zone) {
 		values[i][0] = '0'; values[i][1]='\0';
 	}
 
-	// Manipulate TZ variable for reading local time for different time zones
 	if (strcmp(zone, "Local") == 0) {
-		// Not TZ required for our own local time
+		// No TZ required for our own local time
 		unsetenv("TZ");
 	} else {
+		// Manipulate TZ variable for reading local time for different time zones
 		char zoneEnv[64];
 		sprintf(zoneEnv, "TZ=%s", zone);
 		putenv(zoneEnv);
@@ -89,8 +89,7 @@ static void setClockValue(const ClockStruct *clock) {
 	if (values[0] == 0) {
 		XtSetArg(args[0], XtNvalue, NO_VALUE);
 		XtSetValues( clock->digit[0], args, 1 );
-	}
-	if (values[0] != 0) {
+	} else {
 		XtSetArg(args[0], XtNvalue, values[0]);
 		XtSetValues( clock->digit[0], args, 1 );
 	}
@@ -176,7 +175,7 @@ static void createClockLabelWidget(Widget compo, int numClock, char* title) {
 
 /**
  *
- * @param labelString string like "Frankfurt=Local,GMT,New York=-4"
+ * @param labelString string like "Frankfurt=Local,GMT,New York=America/New_York"
  * @param labels Array of strings created from labelString by splitting at delimiter ','
  * @return number of strings read
  */
@@ -193,7 +192,7 @@ static int readClockInfos(String labelString, String *labels) {
 
 /**
  *
- * @param info input string like "Yolo=-4"
+ * @param info input string like "Yolo=Europe/Berlin"
  * @param parts Array of strings created from labelString by splitting at delimiter '='
  * @return number of strings read (correct is 1 or 2)
  */
