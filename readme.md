@@ -64,8 +64,7 @@ multi-zone-clock*clockPanel.background: black
 multi-zone-clock*clockTitle.background: black
 multi-zone-clock.clockPanel.clockTitle.foreground: red
 
-multi-zone-clock.clocks: Frankfurt=Local,GMT=GMT,New York=-4
-
+multi-zone-clock.clocks: Frankfurt=Local,GMT=GMT,New York=America/New_York
 ```
 
 Example result:
