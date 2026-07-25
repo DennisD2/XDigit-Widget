@@ -3,13 +3,10 @@
  *************************************************************/
 
 #define MAX_CLOCKS 10
-
-#define TIME_LOCAL 0
-#define TIME_GMT 1
-#define TIME_LOCAL_ID 123
+#define TIMEOUT 10000L
 
 #include <X11/Xlib.h>
-#include <X11/Intrinsic.h> 
+#include <X11/Intrinsic.h>
 #include <X11/Composite.h>
 
 #include <Xm/Xm.h>
@@ -18,7 +15,6 @@
 #include "Digit.h"
 
 #include <time.h>
-#define TIMEOUT 10000L
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -26,7 +22,7 @@
 // Clock struct
 typedef struct {
 	String label; // Label for this clock
-	int gmtOffset; // Offset to GMT time
+	String zone; // timezone for this clock
 	Widget digit[5]; //  5 digits per clock
 } ClockStruct;
 
@@ -42,7 +38,7 @@ static ClocksStruct clocksStruct;
  * Get time and convert to values suitable for the Digit widgets.
  * Can return local time of GMT time, depending on time_zone value.
  */
-static void getCurrentTime(int num_values[4], int time_zone) {
+static void getCurrentTime(int num_values[4], String zone) {
 	char values[4][2];
 	int i;
 	time_t t;
@@ -51,13 +47,20 @@ static void getCurrentTime(int num_values[4], int time_zone) {
 		values[i][0] = '0'; values[i][1]='\0';
 	}
 
+	// Manipulate TZ variable for reading local time for different time zones
+	if (strcmp(zone, "Local") == 0) {
+		// Not TZ required for our own local time
+		unsetenv("TZ");
+	} else {
+		char zoneEnv[64];
+		sprintf(zoneEnv, "TZ=%s", zone);
+		putenv(zoneEnv);
+	}
+
 	time( &t );
 	struct tm * tt;
-	if (time_zone == TIME_LOCAL) {
-		tt = localtime(&t);
-	} else {
-		tt = gmtime(&t);
-	}
+	tt = localtime(&t);
+
 	char *buf = asctime(tt);
 	//printf("time: %s\n", buf);
 
@@ -74,17 +77,6 @@ static void getCurrentTime(int num_values[4], int time_zone) {
 	}
 }
 
-
-/*
- * Remove/add some integer offset to a 24 hour value in v[] array
- */
-static void change_hours(int * v, int offset) {
-	int h = v[0]*10 + v[1];
-	h += offset % 24;
-	v[0] = h/10;
-	v[1] = h%10;
-}
-
 /*
  * Set all widgets value resources to digit values defined by values array
  */
@@ -92,17 +84,7 @@ static void setClockValue(const ClockStruct *clock) {
 	Arg args[1];
 	int values[4];
 
-	int zone = TIME_GMT;
-	int offset = 0;
-	if (clock->gmtOffset == TIME_LOCAL_ID) {
-		zone = TIME_LOCAL;
-	} else {
-		offset = clock->gmtOffset;
-	}
-	getCurrentTime(values, zone);
-	if (offset != 0) {
-		change_hours(values, offset);
-	}
+	getCurrentTime(values, clock->zone);
 
 	if (values[0] == 0) {
 		XtSetArg(args[0], XtNvalue, NO_VALUE);
@@ -255,17 +237,8 @@ int main(int argc, char **argv) {
 			printf("Strange clock info (%s)!\n", labels[i]);
 		}
 		clocksStruct.clocks[i].label = infoParts[0];
-		// calculate hours offset
-		if (strcmp(infoParts[1], "Local") == 0) {
-			// No offset for local time
-			clocksStruct.clocks[i].gmtOffset = TIME_LOCAL_ID;
-		} else if (strcmp(infoParts[0], "GMT") == 0) {
-			// No offset for GMT
-			clocksStruct.clocks[i].gmtOffset = 0;
-		} else {
-			clocksStruct.clocks[i].gmtOffset = atoi(infoParts[1]);
-		}
-		//printf("GMT Offset: %d\n", clocksStruct.clocks[i].gmtOffset);
+		clocksStruct.clocks[i].zone = infoParts[1];
+		printf("Clock %d, label='%s', zone='%s'\n", i, clocksStruct.clocks[i].label, clocksStruct.clocks[i].zone);
 	}
 	Display *display = XtDisplay(toplevel);
 /*
