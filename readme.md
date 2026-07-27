@@ -144,6 +144,15 @@ segment_height and segment width is outer box for segment drawing.
 segment_margin is the minimum distance between outer box and polygon for segment area, both in x and y dimension. 
 segment_delta is the horizonal distance between point 0 and 1.
 
+### Info on time zones 
+* if TZ is not set, the zone is usually read from /etc/localtime 
+* /etc/localtime is a link to a real timezone info file, located in /usr/share/zoneinfo
+* /usr/share/zoneinfo contains files like "GMT" and "MET", but also like "America/New_York" and "Europe/Berlin"
+* A timezone file can be dumped with 'zdump -v /usr/share/zoneinfo/Europe/Berlin'
+
+See [timezone-test.c](./timezone-test.c) for manipulating TZ variable to get
+local times for different time zones.
+
 ### Loading fonts in X Windows (Motif)
 List all available X Font names with 
 ```shell

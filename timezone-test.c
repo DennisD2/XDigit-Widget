@@ -4,6 +4,7 @@
 /* if TZ is not set, the zone is usually read from /etc/localtime */
 /* /etc/localtime is a link to a real timezone info file, located in /usr/share/zoneinfo */
 /* /usr/share/zoneinfo contains files like "GMT" and "MET", but also like "America/New_York" and "Europe/Berlin" */
+/* A timezone file can be dumped with 'zdump -v /usr/share/zoneinfo/Europe/Berlin */
 
 #include <time.h>
 #include <stdlib.h>
