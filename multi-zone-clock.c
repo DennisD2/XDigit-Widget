@@ -34,11 +34,18 @@ typedef struct {
 
 static ClocksStruct clocksStruct;
 
+typedef struct {
+	int h10;
+	int h1;
+	int m10;
+	int m1;
+} DigitStruct;
+
 /*
  * Get time and convert to values suitable for the Digit widgets.
  * Can return local time of GMT time, depending on time_zone value.
  */
-static void getCurrentTime(int num_values[4], String zone) {
+static void getCurrentTime(DigitStruct *digits, String zone) {
 	char values[4][2];
 	int i;
 	time_t t;
@@ -72,9 +79,11 @@ static void getCurrentTime(int num_values[4], String zone) {
 	values[1][0] = *p ; p++; p++;
 	values[2][0] = *p ; p++;
 	values[3][0] = *p ;
-	for ( i=0; i<4; i++ ) {
-		num_values[i] = atoi(values[i]);
-	}
+
+	digits->h10 = atoi(values[0]);
+	digits->h1 = atoi(values[1]);
+	digits->m10 = atoi(values[2]);
+	digits->m1 = atoi(values[3]);
 }
 
 /*
@@ -82,23 +91,24 @@ static void getCurrentTime(int num_values[4], String zone) {
  */
 static void setClockValue(const ClockStruct *clock) {
 	Arg args[1];
-	int values[4];
+	//int values[4];
+	DigitStruct digits;
 
-	getCurrentTime(values, clock->zone);
+	getCurrentTime(&digits, clock->zone);
 
-	if (values[0] == 0) {
+	if (digits.h10 == 0) {
 		XtSetArg(args[0], XtNvalue, NO_VALUE);
 		XtSetValues( clock->digit[0], args, 1 );
 	} else {
-		XtSetArg(args[0], XtNvalue, values[0]);
+		XtSetArg(args[0], XtNvalue, digits.h10);
 		XtSetValues( clock->digit[0], args, 1 );
 	}
 
-	XtSetArg(args[0], XtNvalue, values[1]);
+	XtSetArg(args[0], XtNvalue, digits.h1);
 	XtSetValues( clock->digit[1], args, 1 );
-	XtSetArg( args[0], XtNvalue, values[2]);
+	XtSetArg( args[0], XtNvalue, digits.m10);
 	XtSetValues( clock->digit[3], args, 1 );
-	XtSetArg( args[0], XtNvalue, values[3]);
+	XtSetArg( args[0], XtNvalue, digits.m1);
 	XtSetValues( clock->digit[4], args, 1 );
 }
 
