@@ -37,6 +37,7 @@ static ClocksStruct clocksStruct;
 typedef struct {
 	int h;
 	int m;
+	int s;
 } DigitStruct;
 
 /*
@@ -44,10 +45,10 @@ typedef struct {
  * Can return local time of GMT time, depending on time_zone value.
  */
 static void getCurrentTime(DigitStruct *digits, String zone) {
-	char values[4][2];
+	char values[6][2];
 	time_t t;
 
-	for (int i=0;i<4;i++) {
+	for (int i=0;i<6;i++) {
 		values[i][0] = '0'; values[i][1]='\0';
 	}
 
@@ -75,11 +76,14 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 	values[0][0] = *p ; p++;
 	values[1][0] = *p ; p++; p++;
 	values[2][0] = *p ; p++;
-	values[3][0] = *p ;
+	values[3][0] = *p ; p++; p++;
+	values[4][0] = *p ; p++;
+	values[5][0] = *p ;
 
 	digits->h = atoi(values[0])*10 + atoi(values[1]);
 	digits->m = atoi(values[2])*10 + atoi(values[3]);
-	printf("h:m = %d:%d\n", digits->h, digits->m);
+	digits->s = atoi(values[4])*10 + atoi(values[5]);
+	//printf("h:m = %d:%d:%d\n", digits->h, digits->m, digits->s);
 }
 
 /*
