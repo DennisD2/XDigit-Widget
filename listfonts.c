@@ -27,7 +27,4 @@ int main(int argc, char **argv) {
 	for (i=0; i<available; i++) {
 		printf("%i	%s\n", i, fonts[i]);
 	}
-
 }
-
-#include <limits.h>

@@ -4,7 +4,7 @@
 
 #define MAX_CLOCKS 10
 #define TIMEOUT_NOSECONDS 10000L /* 10s */
-#define TIMEOUT_WITHSECONDS 1000L /* 1s */
+#define TIMEOUT_WITH_SECONDS 1000L /* 1s */
 
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
@@ -42,7 +42,7 @@ typedef struct {
 } DigitStruct;
 
 #define DIGIT_WIDGETS_NUM_NOSECONDS 5
-#define DIGIT_WIDGETS_NUM_WITHECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
+#define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
 
 
 static XmFontList the_font_list;
@@ -317,8 +317,8 @@ int main(int argc, char **argv) {
 
 	// Calculate number of required digits based on "showSeconds" flag, also timeout value
 	if (theResources.showSeconds) {
-		theResources.numDigits = DIGIT_WIDGETS_NUM_WITHECONDS;
-		theResources.timeout = TIMEOUT_WITHSECONDS;
+		theResources.numDigits = DIGIT_WIDGETS_NUM_WITH_SECONDS;
+		theResources.timeout = TIMEOUT_WITH_SECONDS;
 	} else {
 		theResources.numDigits = DIGIT_WIDGETS_NUM_NOSECONDS;
 		theResources.timeout = TIMEOUT_NOSECONDS;
