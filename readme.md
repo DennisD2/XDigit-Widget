@@ -5,7 +5,7 @@ There is a test program called "xdigits" which uses 5 of these widgets to implem
 a simple digital clock.
 
 There is another test program called "multi-zone-clock" which shows time values for
-multiple time zones. 
+multiple time zones. It can optionally show seconds.
 
 This code uses Xt, XLib and OSF/Motif library, which should be contained or at least installable via package
 from common Linux installations. These libraries are very old, and they will work even on Retro hardware (like
@@ -76,6 +76,7 @@ multi-zone-clock*clockTitle.background: black
 multi-zone-clock.clockPanel.clockTitle.foreground: red
 
 multi-zone-clock.clocks: Frankfurt=Local,GMT=GMT,New York=America/New_York
+multi-zone-clock.showSeconds: true
 ```
 
 Example result:

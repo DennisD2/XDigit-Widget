@@ -315,7 +315,6 @@ int main(int argc, char **argv) {
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	the_font_list = fontList;
 
-	//theResources.showSeconds=1;
 	// Calculate number of required digits based on "showSeconds" flag, also timeout value
 	if (theResources.showSeconds) {
 		theResources.numDigits = DIGIT_WIDGETS_NUM_WITHECONDS;
