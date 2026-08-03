@@ -35,10 +35,8 @@ typedef struct {
 static ClocksStruct clocksStruct;
 
 typedef struct {
-	int h10;
-	int h1;
-	int m10;
-	int m1;
+	int h;
+	int m;
 } DigitStruct;
 
 /*
@@ -47,10 +45,9 @@ typedef struct {
  */
 static void getCurrentTime(DigitStruct *digits, String zone) {
 	char values[4][2];
-	int i;
 	time_t t;
 
-	for (i=0;i<4;i++) {
+	for (int i=0;i<4;i++) {
 		values[i][0] = '0'; values[i][1]='\0';
 	}
 
@@ -80,10 +77,9 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 	values[2][0] = *p ; p++;
 	values[3][0] = *p ;
 
-	digits->h10 = atoi(values[0]);
-	digits->h1 = atoi(values[1]);
-	digits->m10 = atoi(values[2]);
-	digits->m1 = atoi(values[3]);
+	digits->h = atoi(values[0])*10 + atoi(values[1]);
+	digits->m = atoi(values[2])*10 + atoi(values[3]);
+	printf("h:m = %d:%d\n", digits->h, digits->m);
 }
 
 /*
@@ -96,19 +92,19 @@ static void setClockValue(const ClockStruct *clock) {
 
 	getCurrentTime(&digits, clock->zone);
 
-	if (digits.h10 == 0) {
+	if (digits.h/10 == 0) {
 		XtSetArg(args[0], XtNvalue, NO_VALUE);
 		XtSetValues( clock->digit[0], args, 1 );
 	} else {
-		XtSetArg(args[0], XtNvalue, digits.h10);
+		XtSetArg(args[0], XtNvalue, digits.h/10);
 		XtSetValues( clock->digit[0], args, 1 );
 	}
 
-	XtSetArg(args[0], XtNvalue, digits.h1);
+	XtSetArg(args[0], XtNvalue, digits.h%10);
 	XtSetValues( clock->digit[1], args, 1 );
-	XtSetArg( args[0], XtNvalue, digits.m10);
+	XtSetArg( args[0], XtNvalue, digits.m/10);
 	XtSetValues( clock->digit[3], args, 1 );
-	XtSetArg( args[0], XtNvalue, digits.m1);
+	XtSetArg( args[0], XtNvalue, digits.m%10);
 	XtSetValues( clock->digit[4], args, 1 );
 }
 
