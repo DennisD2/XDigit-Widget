@@ -3,7 +3,8 @@
  *************************************************************/
 
 #define MAX_CLOCKS 10
-#define TIMEOUT 10000L
+#define TIMEOUT_NOSECONDS 10000L /* 10s */
+#define TIMEOUT_WITHSECONDS 1000L /* 1s */
 
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
@@ -23,7 +24,7 @@
 typedef struct {
 	String label; // Label for this clock
 	String zone; // timezone for this clock
-	Widget digit[5]; //  5 digits per clock
+	Widget digit[8]; //  5 or 8 digits per clock
 } ClockStruct;
 
 // all clocks, additional number of clocks
@@ -39,6 +40,50 @@ typedef struct {
 	int m;
 	int s;
 } DigitStruct;
+
+#define DIGIT_WIDGETS_NUM_NOSECONDS 5
+#define DIGIT_WIDGETS_NUM_WITHECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
+
+
+static XmFontList the_font_list;
+
+/*---------------------------*/
+/* App Resources definitions */
+/*---------------------------*/
+
+typedef struct {
+	Pixel foreground;
+	Pixel background;
+	String labels;
+	Boolean showSeconds;
+	int numDigits; // calculated in main(), from showSeconds
+	int timeout; // calculated in main(), from showSeconds
+	/*XFontStruct *fontStruct; */
+} Resources;
+
+static Resources theResources;
+
+static XtResource resourceSpec[] = {
+	{ XtNforeground, XtCForeground, XtRPixel, sizeof(Pixel),
+	  XtOffsetOf(Resources, foreground),
+	  XtRString, "XtDefaultForeground"},
+	{ XtNbackground, XtCBackground, XtRPixel, sizeof(Pixel),
+	  XtOffsetOf(Resources, background),
+	  XtRString, "XtDefaultBackground"},
+	{ "clocks", "Clocks", XtRString, sizeof(String),
+	XtOffsetOf(Resources, labels),
+	XtRString, "local"},
+	{ "showSeconds", XtCBoolean, XtRBoolean, sizeof(Boolean),
+	XtOffsetOf(Resources, showSeconds),
+	XtRString, "false"},
+	/*{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
+		XtOffsetOf(Resources, fontStruct),
+		XtRString, "XtDefaultFont"},*/
+};
+
+/*---------------------------*/
+/* App functions             */
+/*---------------------------*/
 
 /*
  * Get time and convert to values suitable for the Digit widgets.
@@ -110,6 +155,12 @@ static void setClockValue(const ClockStruct *clock) {
 	XtSetValues( clock->digit[3], args, 1 );
 	XtSetArg( args[0], XtNvalue, digits.m%10);
 	XtSetValues( clock->digit[4], args, 1 );
+	if (theResources.showSeconds) {
+		XtSetArg(args[0], XtNvalue, digits.s/10);
+		XtSetValues( clock->digit[6], args, 1 );
+		XtSetArg(args[0], XtNvalue, digits.s%10);
+		XtSetValues( clock->digit[7], args, 1 );
+	}
 }
 
 /*
@@ -125,17 +176,17 @@ static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	/*
 	 * start time out from the beginning 
 	 */
-	XtAddTimeOut( TIMEOUT, TimeoutCB, clockStruct );
+	XtAddTimeOut( theResources.timeout, TimeoutCB, clockStruct );
 }
 
 static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) {
 	Arg args[8];
-	for ( int i=0; i<5; i++ ) {
+	for ( int i=0; i<theResources.numDigits; i++ ) {
 		int n=0;
 		XtSetArg( args[n], XtNx, (Position)i*60 ); n++;
 		XtSetArg( args[n], XtNy, (Position)row*100 ); n++;
 		XtSetArg( args[n], XtNwidth, (Dimension)60 ); n++;
-		if (i==2 )
+		if (i==2 || i==5 )
 			XtSetArg( args[n], XtNvalue, DOUBLEPOINT_VALUE );
 		else
 			XtSetArg( args[n], XtNvalue, i );
@@ -145,39 +196,13 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
 	}
 }
 
-static XmFontList the_font_list;
-
-typedef struct {
-	Pixel foreground;
-	Pixel background;
-	String labels;
-	/*XFontStruct *fontStruct; */
-} Resources;
-
-static Resources theResources;
-
-static XtResource resourceSpec[] = {
-	{ XtNforeground, XtCForeground, XtRPixel, sizeof(Pixel),
-	  XtOffsetOf(Resources, foreground),
-	  XtRString, "XtDefaultForeground"},
-	{ XtNbackground, XtCBackground, XtRPixel, sizeof(Pixel),
-	  XtOffsetOf(Resources, background),
-	  XtRString, "XtDefaultBackground"},
-	{ "clocks", "Clocks", XtRString, sizeof(String),
-	XtOffsetOf(Resources, labels),
-	XtRString, "local"},
-	/*{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
-		XtOffsetOf(Resources, fontStruct),
-		XtRString, "XtDefaultFont"},*/
-};
-
 static void createClockLabelWidget(Widget compo, int numClock, char* title) {
 	Arg wargs[7];
 	int n=0;
 
 	XmString xmstr = XmStringCreate(title, XmSTRING_DEFAULT_CHARSET);
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
-	XtSetArg( wargs[n], XtNx, (Position)10 + 5*60 + 5); n++;
+	XtSetArg( wargs[n], XtNx, (Position)10 + theResources.numDigits*60 + 5); n++;
 	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
 	XtSetArg( wargs[n], XmNfontList, the_font_list ); n++;
 	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
@@ -235,6 +260,7 @@ int main(int argc, char **argv) {
 	} else {
 		printf("%d clocks defined\n", numClocks);
 	}
+	printf("showSeconds = %d\n", theResources.showSeconds);
 
     clocksStruct.numClocks = numClocks;
     clocksStruct.clocks = malloc(sizeof(ClockStruct)*numClocks);
@@ -289,11 +315,22 @@ int main(int argc, char **argv) {
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	the_font_list = fontList;
 
+	//theResources.showSeconds=1;
+	// Calculate number of required digits based on "showSeconds" flag, also timeout value
+	if (theResources.showSeconds) {
+		theResources.numDigits = DIGIT_WIDGETS_NUM_WITHECONDS;
+		theResources.timeout = TIMEOUT_WITHSECONDS;
+	} else {
+		theResources.numDigits = DIGIT_WIDGETS_NUM_NOSECONDS;
+		theResources.timeout = TIMEOUT_NOSECONDS;
+	}
+
     /*
      * Create a container widget for all the digits
      */
+
     int n = 0;
-    XtSetArg( args[n], XtNwidth, (Dimension)500 ); n++;
+    XtSetArg( args[n], XtNwidth, (Dimension)theResources.numDigits*60 + 200 ); n++;
     XtSetArg( args[n], XtNheight, (Dimension)numClocks*100 ); n++;
     Widget compo = XtCreateManagedWidget("clockPanel", compositeWidgetClass,
                                          toplevel, args, n);
@@ -312,7 +349,7 @@ int main(int argc, char **argv) {
 	TimeoutCB( (XtPointer)&clocksStruct, NULL );
 
 	/* add time out */
-	XtAddTimeOut( TIMEOUT, TimeoutCB, &clocksStruct );
+	XtAddTimeOut( theResources.timeout, TimeoutCB, &clocksStruct );
 
     XtMainLoop();
 }
