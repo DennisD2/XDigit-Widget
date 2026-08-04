@@ -187,7 +187,7 @@ static void setClockValue(const ClockStruct *clock) {
 
 	// Optimize timeout value to match as good as possible the zero crossing of seconds value
 	// Not required if we have timeout every second:
-	if (theResources.showSeconds == 1)
+	if (theResources.showSeconds)
 		return;
 	// optimize timeout value
 	int glitch = digits.s % 10;
@@ -195,7 +195,7 @@ static void setClockValue(const ClockStruct *clock) {
 	if (glitch == 0) {
 		setTimeoutValue(TIMEOUT_DEFAULT);
 	} else {
-		setTimeoutValue(10-glitch);
+		setTimeoutValue(10 - glitch);
 	}
 }
 
