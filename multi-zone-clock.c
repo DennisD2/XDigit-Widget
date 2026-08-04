@@ -233,10 +233,12 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
 }
 
 /**
- * Create a label/title for a clock row
+ * Create a label/title widget and a date widget for a clock
  * @param compo parent widget
  * @param numClock clock row
  * @param title text to display
+ * @param labelWidget returns created widget
+ * @param dateWidget returns created widget
  */
 static void createClockLabelWidgets(Widget compo, int numClock, char* title, Widget *labelWidget, Widget *dateWidget) {
 	Arg wargs[7];
@@ -260,6 +262,13 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 	XmStringFree( xmstr );
 }
 
+/**
+ * Set date string for a dateWidget
+ * @param dateWidget widget to use
+ * @param day date part
+ * @param month date part
+ * @param year date part
+ */
 static void setDateLabel(Widget dateWidget, int day, int month, int year) {
 	Arg args[1];
 	char buf[32];
@@ -271,7 +280,7 @@ static void setDateLabel(Widget dateWidget, int day, int month, int year) {
 }
 
 /**
- *
+ * Parse "clocks" string from resources
  * @param labelString string like "Frankfurt=Local,GMT,New York=America/New_York"
  * @param labels Array of strings created from labelString by splitting at delimiter ','
  * @return number of strings read
@@ -288,7 +297,7 @@ static int readClockInfos(String labelString, String *labels) {
 }
 
 /**
- *
+ * Splits clock title and clock timezone string parts
  * @param info input string like "Yolo=Europe/Berlin"
  * @param parts Array of strings created from labelString by splitting at delimiter '='
  * @return number of strings read (correct is 1 or 2)
