@@ -29,6 +29,8 @@
 #define DIGIT_WIDGETS_NUM_NOSECONDS 5
 #define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
 
+static void setDateLabel(Widget date, int day, int month, int year);
+
 /*---------------------------*/
 /* App Types definitions     */
 /*---------------------------*/
@@ -39,6 +41,7 @@ typedef struct {
 	String zone; // timezone for this clock
 	Widget digit[8]; //  5 or 8 digits per clock
 	Widget labelWidget;
+	Widget dateWidget;
 } ClockStruct;
 
 // all clocks, additional number of clocks
@@ -173,6 +176,8 @@ static void setClockValue(const ClockStruct *clock) {
 		XtSetValues( clock->digit[7], args, 1 );
 	}
 
+	setDateLabel( clock->dateWidget, digits.day, digits.month, digits.year);
+
 	// Optimize timeout value to match as good as possible the zero crossing of seconds value
 	// Not required if we have timeout every second:
 	if (theResources.showSeconds)
@@ -233,17 +238,36 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
  * @param numClock clock row
  * @param title text to display
  */
-static Widget createClockLabelWidget(Widget compo, int numClock, char* title) {
+static void createClockLabelWidgets(Widget compo, int numClock, char* title, Widget *labelWidget, Widget *dateWidget) {
 	Arg wargs[7];
 	int n=0;
 
 	XmString xmstr = XmStringCreate(title, XmSTRING_DEFAULT_CHARSET);
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
 	XtSetArg( wargs[n], XtNx, (Position)10 + theResources.numDigits*60 + 5); n++;
-	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
+	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 - 20); n++;
 	XtSetArg( wargs[n], XmNfontList, the_font_list ); n++;
-	Widget w = XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
-	return w;
+	*labelWidget = XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
+	XmStringFree( xmstr );
+
+	n=0;
+	xmstr = XmStringCreate("hehe", XmSTRING_DEFAULT_CHARSET);
+	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
+	XtSetArg( wargs[n], XtNx, (Position)10 + theResources.numDigits*60 + 5); n++;
+	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 + 10 ); n++;
+	XtSetArg( wargs[n], XmNfontList, the_font_list ); n++;
+	*dateWidget = XtCreateManagedWidget("clockDate", xmLabelWidgetClass, compo, wargs, n);
+	XmStringFree( xmstr );
+}
+
+static void setDateLabel(Widget dateWidget, int day, int month, int year) {
+	Arg args[1];
+	char buf[32];
+	sprintf(buf, "%d.%d.%d", day, month, year);
+	XmString xmstr = XmStringCreate(buf, XmSTRING_DEFAULT_CHARSET);
+	XtSetArg( args[0], XmNlabelString, xmstr );
+	XtSetValues( dateWidget, args, 1 );
+	XmStringFree( xmstr );
 }
 
 /**
@@ -375,7 +399,7 @@ int main(int argc, char **argv) {
      * Create all digit widgets
      */
 	for ( i=0; i<numClocks; i++ ) {
-		clocksStruct.clocks[i].labelWidget = createClockLabelWidget(compo,i, labels[i]);
+		createClockLabelWidgets(compo,i, labels[i], &(clocksStruct.clocks[i].labelWidget), &(clocksStruct.clocks[i].dateWidget));
 		createClockWidgets(compo, &clocksStruct.clocks[i], i);
 	}
 
