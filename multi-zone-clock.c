@@ -75,7 +75,7 @@ typedef struct {
 	String labels;
 	Boolean showSeconds;
 	int numDigits; // calculated in main(), from showSeconds
-	int timeout; // calculated in main(), from showSeconds
+	int timeout; // calculated in setTimeoutValue()
 	/*XFontStruct *fontStruct; */
 } Resources;
 
@@ -118,7 +118,7 @@ void setTimeoutValue(int newValue) {
 
 /*
  * Get time and convert to values suitable for the Digit widgets.
- * Can return local time of GMT time, depending on time_zone value.
+ * Can return arbitrary remote "local" times. This feature is reached by manipulating TZ variable.
  */
 static void getCurrentTime(DigitStruct *digits, String zone) {
 	if (strcmp(zone, "Local") == 0) {
@@ -147,7 +147,7 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 }
 
 /*
- * Set all widgets value resources to digit values defined by values array
+ * Set all widgets value resources to current time/date value. Includes digits and date widget.
  */
 static void setClockValue(const ClockStruct *clock) {
 	Arg args[1];
@@ -182,6 +182,7 @@ static void setClockValue(const ClockStruct *clock) {
 	// Not required if we have timeout every second:
 	if (theResources.showSeconds)
 		return;
+
 	// optimize timeout value
 	int glitch = digits.s % 10;
 	//printf("glitch=%d\n", glitch);
@@ -397,7 +398,6 @@ int main(int argc, char **argv) {
     /*
      * Create a container widget for all the digits
      */
-
     int n = 0;
     XtSetArg( args[n], XtNwidth, (Dimension)theResources.numDigits*60 + 200 ); n++;
     XtSetArg( args[n], XtNheight, (Dimension)numClocks*100 ); n++;
@@ -405,7 +405,7 @@ int main(int argc, char **argv) {
                                          toplevel, args, n);
 
 	/*
-     * Create all digit widgets
+     * Create all digit widgets and title+date widgets per clock
      */
 	for ( i=0; i<numClocks; i++ ) {
 		createClockLabelWidgets(compo,i, labels[i], &(clocksStruct.clocks[i].labelWidget), &(clocksStruct.clocks[i].dateWidget));
