@@ -53,6 +53,9 @@ typedef struct {
 	int h;
 	int m;
 	int s;
+	int day;
+	int month;
+	int year;
 } DigitStruct;
 
 // global static variable for all fonts
@@ -133,6 +136,9 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 	digits->h = tt->tm_hour;
 	digits->m = tt->tm_min;
 	digits->s = tt->tm_sec;
+	digits->day = tt->tm_mday;
+	digits->month = tt->tm_mon;
+	digits->year = tt->tm_year +1900L;
 	//printf("h:m = %d:%d:%d\n", digits->h, digits->m, digits->s);
 }
 
