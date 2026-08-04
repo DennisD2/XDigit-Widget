@@ -24,6 +24,8 @@
 
 #define TIMEOUT_NOSECONDS 10000L /* 10s */
 #define TIMEOUT_WITH_SECONDS 1000L /* 1s */
+#define TIMEOUT_DEFAULT -1
+
 #define DIGIT_WIDGETS_NUM_NOSECONDS 5
 #define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
 
@@ -93,7 +95,6 @@ static XtResource resourceSpec[] = {
 /*---------------------------*/
 /* App functions             */
 /*---------------------------*/
-#define TIMEOUT_DEFAULT -1
 
 // Set default timeout value
 void setTimeoutValue(int newValue) {
