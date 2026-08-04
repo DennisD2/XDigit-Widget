@@ -94,6 +94,18 @@ static XtResource resourceSpec[] = {
 /* App functions             */
 /*---------------------------*/
 
+// Calculate number of required digits based on "showSeconds" flag, also timeout value
+void setupClockControlValues(void) {
+
+	if (theResources.showSeconds) {
+		theResources.numDigits = DIGIT_WIDGETS_NUM_WITH_SECONDS;
+		theResources.timeout = TIMEOUT_WITH_SECONDS;
+	} else {
+		theResources.numDigits = DIGIT_WIDGETS_NUM_NOSECONDS;
+		theResources.timeout = TIMEOUT_NOSECONDS;
+	}
+}
+
 /*
  * Get time and convert to values suitable for the Digit widgets.
  * Can return local time of GMT time, depending on time_zone value.
@@ -169,6 +181,19 @@ static void setClockValue(const ClockStruct *clock) {
 		XtSetValues( clock->digit[6], args, 1 );
 		XtSetArg(args[0], XtNvalue, digits.s%10);
 		XtSetValues( clock->digit[7], args, 1 );
+	}
+
+	// Optimize timeout value to match as good as possible the zero crossing of seconds value
+	// Not required if we have timeout every second:
+	if (theResources.showSeconds == 1)
+		return;
+	// optimize timeout value
+	int glitch = digits.s % 10;
+	//printf("glitch=%d\n", glitch);
+	if (glitch == 0) {
+		setupClockControlValues();
+	} else {
+		theResources.timeout = 10 - glitch;
 	}
 }
 
@@ -324,14 +349,7 @@ int main(int argc, char **argv) {
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	the_font_list = fontList;
 
-	// Calculate number of required digits based on "showSeconds" flag, also timeout value
-	if (theResources.showSeconds) {
-		theResources.numDigits = DIGIT_WIDGETS_NUM_WITH_SECONDS;
-		theResources.timeout = TIMEOUT_WITH_SECONDS;
-	} else {
-		theResources.numDigits = DIGIT_WIDGETS_NUM_NOSECONDS;
-		theResources.timeout = TIMEOUT_NOSECONDS;
-	}
+	setupClockControlValues();
 
     /*
      * Create a container widget for all the digits
