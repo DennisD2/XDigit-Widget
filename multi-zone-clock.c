@@ -350,7 +350,6 @@ int main(int argc, char **argv) {
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	the_font_list = fontList;
 
-	theResources.showSeconds=1;
 	if (theResources.showSeconds) {
 		theResources.numDigits = DIGIT_WIDGETS_NUM_WITH_SECONDS;
 	} else {
