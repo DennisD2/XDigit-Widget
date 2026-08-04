@@ -114,13 +114,6 @@ void setTimeoutValue(int newValue) {
  * Can return local time of GMT time, depending on time_zone value.
  */
 static void getCurrentTime(DigitStruct *digits, String zone) {
-	char values[6][2];
-	time_t t;
-
-	for (int i=0;i<6;i++) {
-		values[i][0] = '0'; values[i][1]='\0';
-	}
-
 	if (strcmp(zone, "Local") == 0) {
 		// No TZ required for our own local time
 		unsetenv("TZ");
@@ -131,27 +124,15 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 		putenv(zoneEnv);
 	}
 
+	time_t t;
 	time( &t );
 	struct tm * tt;
 	tt = localtime(&t);
+	//printf("time: %s\n", asctime(tt));
 
-	char *buf = asctime(tt);
-	//printf("time: %s\n", buf);
-
-	char *p=buf;
-	while (!isdigit(*p)) p++;
-	while (isdigit(*p)) p++;
-	while (!isdigit(*p)) p++;
-	values[0][0] = *p ; p++;
-	values[1][0] = *p ; p++; p++;
-	values[2][0] = *p ; p++;
-	values[3][0] = *p ; p++; p++;
-	values[4][0] = *p ; p++;
-	values[5][0] = *p ;
-
-	digits->h = atoi(values[0])*10 + atoi(values[1]);
-	digits->m = atoi(values[2])*10 + atoi(values[3]);
-	digits->s = atoi(values[4])*10 + atoi(values[5]);
+	digits->h = tt->tm_hour;
+	digits->m = tt->tm_min;
+	digits->s = tt->tm_sec;
 	//printf("h:m = %d:%d:%d\n", digits->h, digits->m, digits->s);
 }
 
@@ -364,6 +345,7 @@ int main(int argc, char **argv) {
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	the_font_list = fontList;
 
+	//theResources.showSeconds=1;
 	if (theResources.showSeconds) {
 		theResources.numDigits = DIGIT_WIDGETS_NUM_WITH_SECONDS;
 	} else {
