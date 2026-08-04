@@ -96,7 +96,7 @@ static XtResource resourceSpec[] = {
 /* App functions             */
 /*---------------------------*/
 
-// Set default timeout value
+// Set timeout value either to default or a new value
 void setTimeoutValue(int newValue) {
 	if (newValue == TIMEOUT_DEFAULT) {
 		if (theResources.showSeconds) {
@@ -215,6 +215,13 @@ static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	XtAddTimeOut( theResources.timeout, TimeoutCB, clockStruct );
 }
 
+//
+/**
+ * Create all required digit widgets fopr a single clock row
+ * @param compo parent
+ * @param clockDigits in/out parameter containinga ll created widgets
+ * @param row clock row for we are creating new widgets
+ */
 static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) {
 	Arg args[8];
 	for ( int i=0; i<theResources.numDigits; i++ ) {
@@ -232,6 +239,12 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
 	}
 }
 
+/**
+ * Create a label/title for a clock row
+ * @param compo parent widget
+ * @param numClock clock row
+ * @param title text to display
+ */
 static void createClockLabelWidget(Widget compo, int numClock, char* title) {
 	Arg wargs[7];
 	int n=0;
