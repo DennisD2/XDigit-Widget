@@ -38,6 +38,7 @@ typedef struct {
 	String label; // Label for this clock
 	String zone; // timezone for this clock
 	Widget digit[8]; //  5 or 8 digits per clock
+	Widget labelWidget;
 } ClockStruct;
 
 // all clocks, additional number of clocks
@@ -232,7 +233,7 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
  * @param numClock clock row
  * @param title text to display
  */
-static void createClockLabelWidget(Widget compo, int numClock, char* title) {
+static Widget createClockLabelWidget(Widget compo, int numClock, char* title) {
 	Arg wargs[7];
 	int n=0;
 
@@ -241,7 +242,8 @@ static void createClockLabelWidget(Widget compo, int numClock, char* title) {
 	XtSetArg( wargs[n], XtNx, (Position)10 + theResources.numDigits*60 + 5); n++;
 	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 ); n++;
 	XtSetArg( wargs[n], XmNfontList, the_font_list ); n++;
-	XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
+	Widget w = XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
+	return w;
 }
 
 /**
@@ -373,7 +375,7 @@ int main(int argc, char **argv) {
      * Create all digit widgets
      */
 	for ( i=0; i<numClocks; i++ ) {
-		createClockLabelWidget(compo,i, labels[i]);
+		clocksStruct.clocks[i].labelWidget = createClockLabelWidget(compo,i, labels[i]);
 		createClockWidgets(compo, &clocksStruct.clocks[i], i);
 	}
 
