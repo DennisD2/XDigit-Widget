@@ -93,13 +93,18 @@ static XtResource resourceSpec[] = {
 /*---------------------------*/
 /* App functions             */
 /*---------------------------*/
+#define TIMEOUT_DEFAULT -1
 
 // Set default timeout value
-void setupDefaultTimeout(void) {
-	if (theResources.showSeconds) {
-		theResources.timeout = TIMEOUT_WITH_SECONDS;
+void setTimeoutValue(int newValue) {
+	if (newValue == TIMEOUT_DEFAULT) {
+		if (theResources.showSeconds) {
+			theResources.timeout = TIMEOUT_WITH_SECONDS;
+		} else {
+			theResources.timeout = TIMEOUT_NOSECONDS;
+		}
 	} else {
-		theResources.timeout = TIMEOUT_NOSECONDS;
+		theResources.timeout = newValue;
 	}
 }
 
@@ -187,9 +192,9 @@ static void setClockValue(const ClockStruct *clock) {
 	int glitch = digits.s % 10;
 	//printf("glitch=%d\n", glitch);
 	if (glitch == 0) {
-		setupDefaultTimeout();
+		setTimeoutValue(TIMEOUT_DEFAULT);
 	} else {
-		theResources.timeout = 10 - glitch;
+		setTimeoutValue(10-glitch);
 	}
 }
 
@@ -345,12 +350,13 @@ int main(int argc, char **argv) {
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	the_font_list = fontList;
 
+	theResources.showSeconds=1;
 	if (theResources.showSeconds) {
 		theResources.numDigits = DIGIT_WIDGETS_NUM_WITH_SECONDS;
 	} else {
 		theResources.numDigits = DIGIT_WIDGETS_NUM_NOSECONDS;
 	}
-	setupDefaultTimeout();
+	setTimeoutValue(TIMEOUT_DEFAULT);
 
     /*
      * Create a container widget for all the digits
