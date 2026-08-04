@@ -2,10 +2,6 @@
  * multi-zone-clock.c : multi-zone digital clock
  *************************************************************/
 
-#define MAX_CLOCKS 10
-#define TIMEOUT_NOSECONDS 10000L /* 10s */
-#define TIMEOUT_WITH_SECONDS 1000L /* 1s */
-
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/Composite.h>
@@ -20,6 +16,21 @@
 #include <stdio.h>
 #include <ctype.h>
 
+/*---------------------------*/
+/* App defines               */
+/*---------------------------*/
+// Maximum number of clocks
+#define MAX_CLOCKS 10
+
+#define TIMEOUT_NOSECONDS 10000L /* 10s */
+#define TIMEOUT_WITH_SECONDS 1000L /* 1s */
+#define DIGIT_WIDGETS_NUM_NOSECONDS 5
+#define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
+
+/*---------------------------*/
+/* App Types definitions     */
+/*---------------------------*/
+
 // Clock struct
 typedef struct {
 	String label; // Label for this clock
@@ -33,6 +44,7 @@ typedef struct {
 	ClockStruct *clocks;
 } ClocksStruct;
 
+// global static variable for all clocks
 static ClocksStruct clocksStruct;
 
 typedef struct {
@@ -41,10 +53,7 @@ typedef struct {
 	int s;
 } DigitStruct;
 
-#define DIGIT_WIDGETS_NUM_NOSECONDS 5
-#define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
-
-
+// global static variable for all fonts
 static XmFontList the_font_list;
 
 /*---------------------------*/
