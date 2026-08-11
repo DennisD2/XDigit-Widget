@@ -28,6 +28,9 @@
 #define DIGIT_WIDGETS_NUM_NOSECONDS 5
 #define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
 
+// widget geometries; these values should be calculated from screen dimensions; but for now, we offer
+// two geometries, small (_B) and large (_A), for small screens (<1500x1000) and large screens
+// Also font size is handled in this way, but should be calculated (font size) from actual geometries
 #define DEFAULT_DIGIT_WIDTH_A 60
 #define DEFAULT_DIGIT_HEIGHT_A 100
 #define DEFAULT_TEXTAREA_WIDTH_A 200
@@ -38,7 +41,7 @@
 #define DEFAULT_DIGIT_HEIGHT_B 50
 #define DEFAULT_TEXTAREA_WIDTH_B 100
 #define LABEL_X_OFFSET_B 15
-#define LABEL_Y_OFFSET_B 14
+#define LABEL_Y_OFFSET_B 12
 
 #define SOMEFONT_A "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
 #define SOMEFONT_B "-*-bold-*-normal--16-*-*-*-*-*-iso8859-1"
