@@ -31,17 +31,17 @@
 #define DEFAULT_DIGIT_WIDTH_A 60
 #define DEFAULT_DIGIT_HEIGHT_A 100
 #define DEFAULT_TEXTAREA_WIDTH_A 200
-#define LABEL_X_OFFSET_A 10+5
+#define LABEL_X_OFFSET_A 15
 #define LABEL_Y_OFFSET_A 20
 
 #define DEFAULT_DIGIT_WIDTH_B 30
 #define DEFAULT_DIGIT_HEIGHT_B 50
 #define DEFAULT_TEXTAREA_WIDTH_B 100
-#define LABEL_X_OFFSET_B 10+5
-#define LABEL_Y_OFFSET_B 10
+#define LABEL_X_OFFSET_B 15
+#define LABEL_Y_OFFSET_B 14
 
 #define SOMEFONT_A "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
-#define SOMEFONT_B "-*-*-*-normal--16-*-*-*-*-*-iso8859-1"
+#define SOMEFONT_B "-*-bold-*-normal--16-*-*-*-*-*-iso8859-1"
 
 static void setDateLabel(Widget date, int day, int month, int year);
 
