@@ -398,9 +398,9 @@ int main(int argc, char **argv) {
 	clocksStruct.screenWidth = XDisplayWidth(display, 0);
 	clocksStruct.screenHeight = XDisplayHeight(display, 0);
 
-	clocksStruct.screenWidth = 1024;
-	clocksStruct.screenHeight = 768;
-
+	// to force small size
+	//clocksStruct.screenWidth = 1024;
+	//clocksStruct.screenHeight = 768;
 	printf("Screen dimensions %dx%d\n", clocksStruct.screenWidth, clocksStruct.screenHeight);
 
 	calculateWidgetDimensions(&clocksStruct);
