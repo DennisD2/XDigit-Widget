@@ -28,9 +28,9 @@
 #define DIGIT_WIDGETS_NUM_NOSECONDS 5
 #define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
 
-#define DEFAULT_DIGIT_WIDTH 60
-#define DEFAULT_DIGIT_HEIGHT 100
-#define DEFAULT_TEXTAREA_WIDTH 200
+#define DEFAULT_DIGIT_WIDTH 30
+#define DEFAULT_DIGIT_HEIGHT 50
+#define DEFAULT_TEXTAREA_WIDTH 100
 
 static void setDateLabel(Widget date, int day, int month, int year);
 
@@ -224,6 +224,7 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
 		XtSetArg( args[n], XtNx, (Position)i*DEFAULT_DIGIT_WIDTH ); n++;
 		XtSetArg( args[n], XtNy, (Position)row*DEFAULT_DIGIT_HEIGHT ); n++;
 		XtSetArg( args[n], XtNwidth, (Dimension)DEFAULT_DIGIT_WIDTH ); n++;
+		XtSetArg( args[n], XtNheight, (Dimension)DEFAULT_DIGIT_HEIGHT ); n++;
 		if (i==2 || i==5 )
 			XtSetArg( args[n], XtNvalue, DOUBLEPOINT_VALUE );
 		else
