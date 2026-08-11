@@ -28,6 +28,10 @@
 #define DIGIT_WIDGETS_NUM_NOSECONDS 5
 #define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
 
+#define DEFAULT_DIGIT_WIDTH 60
+#define DEFAULT_DIGIT_HEIGHT 100
+#define DEFAULT_TEXTAREA_WIDTH 200
+
 static void setDateLabel(Widget date, int day, int month, int year);
 
 /*---------------------------*/
@@ -217,9 +221,9 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
 	Arg args[8];
 	for ( int i=0; i<clocksStruct.numDigits; i++ ) {
 		int n=0;
-		XtSetArg( args[n], XtNx, (Position)i*60 ); n++;
-		XtSetArg( args[n], XtNy, (Position)row*100 ); n++;
-		XtSetArg( args[n], XtNwidth, (Dimension)60 ); n++;
+		XtSetArg( args[n], XtNx, (Position)i*DEFAULT_DIGIT_WIDTH ); n++;
+		XtSetArg( args[n], XtNy, (Position)row*DEFAULT_DIGIT_HEIGHT ); n++;
+		XtSetArg( args[n], XtNwidth, (Dimension)DEFAULT_DIGIT_WIDTH ); n++;
 		if (i==2 || i==5 )
 			XtSetArg( args[n], XtNvalue, DOUBLEPOINT_VALUE );
 		else
@@ -244,8 +248,8 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 
 	XmString xmstr = XmStringCreate(title, XmSTRING_DEFAULT_CHARSET);
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
-	XtSetArg( wargs[n], XtNx, (Position)10 + clocksStruct.numDigits*60 + 5); n++;
-	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 - 20); n++;
+	XtSetArg( wargs[n], XtNx, (Position)10 + clocksStruct.numDigits*DEFAULT_DIGIT_WIDTH + 5); n++;
+	XtSetArg( wargs[n], XtNy, (Position)numClock*DEFAULT_DIGIT_HEIGHT + DEFAULT_DIGIT_HEIGHT/2 - 20); n++;
 	XtSetArg( wargs[n], XmNfontList, clocksStruct.fontList ); n++;
 	*labelWidget = XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 	XmStringFree( xmstr );
@@ -253,8 +257,8 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 	n=0;
 	xmstr = XmStringCreate("hehe", XmSTRING_DEFAULT_CHARSET);
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
-	XtSetArg( wargs[n], XtNx, (Position)10 + clocksStruct.numDigits*60 + 5); n++;
-	XtSetArg( wargs[n], XtNy, (Position)numClock*100 + 100/2 + 10 ); n++;
+	XtSetArg( wargs[n], XtNx, (Position)10 + clocksStruct.numDigits*DEFAULT_DIGIT_WIDTH + 5); n++;
+	XtSetArg( wargs[n], XtNy, (Position)numClock*DEFAULT_DIGIT_HEIGHT + DEFAULT_DIGIT_HEIGHT/2 + 10 ); n++;
 	XtSetArg( wargs[n], XmNfontList, clocksStruct.fontList ); n++;
 	*dateWidget = XtCreateManagedWidget("clockDate", xmLabelWidgetClass, compo, wargs, n);
 	XmStringFree( xmstr );
@@ -396,8 +400,8 @@ int main(int argc, char **argv) {
      * Create a container widget for all the digits
      */
     int n = 0;
-    XtSetArg( args[n], XtNwidth, (Dimension)clocksStruct.numDigits*60 + 200 ); n++;
-    XtSetArg( args[n], XtNheight, (Dimension)numClocks*100 ); n++;
+    XtSetArg( args[n], XtNwidth, (Dimension)clocksStruct.numDigits*DEFAULT_DIGIT_WIDTH + DEFAULT_TEXTAREA_WIDTH ); n++;
+    XtSetArg( args[n], XtNheight, (Dimension)numClocks*DEFAULT_DIGIT_HEIGHT ); n++;
     Widget compo = XtCreateManagedWidget("clockPanel", compositeWidgetClass,
                                          toplevel, args, n);
 
