@@ -8,7 +8,7 @@ CCOPTIONS       =-Wall -I/usr/local/include
 #endif
 #INCLUDES        += 
 
-#if defined(LinuxArchitecture)
+#if !defined(OpenBSDArchitecture)
 LDOPTIONS       += -L.
 #else
 LDOPTIONS       += -L. -L/usr/local/lib
