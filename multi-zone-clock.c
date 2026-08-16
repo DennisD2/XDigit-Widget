@@ -44,7 +44,7 @@
 #define LABEL_Y_OFFSET_B 12
 
 //#define SOMEFONT_A "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
-//#define SOMEFONT_B "-*-bold-*-normal--16-*-*-*-*-*-iso8859-1"
+//#define SOMEFONT_B -*-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1
 
 static void setDateLabel(Widget date, int day, int month, int year);
 
