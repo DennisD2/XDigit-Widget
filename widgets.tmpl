@@ -3,7 +3,13 @@
  */
 
 CC              =   gcc
+
+#ifdef OpenBSDArchitecture
+CFLAGS          +=
+#else
 CFLAGS          +=  -std=c17
+#endif
+
 CDEBUGFLAGS     =   -g
 SYS_LIBRARIES   =   -lXt $(XLIB)
 

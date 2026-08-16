@@ -1,10 +1,19 @@
 
 #include <widgets.tmpl>
 
+#ifdef OpenBSDArchitecture
+CCOPTIONS       =-Wall -I/usr/local/include
+#else
 CCOPTIONS       =-Wall
-#INCLUDES        +=
+#endif
+#INCLUDES        += 
 
-LDOPTIONS       = -L.
+#ifdef OpenBSDArchitecture
+LDOPTIONS       += -L. -L/usr/local/lib
+#else
+LDOPTIONS       += -L.
+#endif
+
 LOCAL_LIBRARIES = -lWidgets -lXm
 #  EXTRA_DEFINES =
 EXTENSIONLIB     =
