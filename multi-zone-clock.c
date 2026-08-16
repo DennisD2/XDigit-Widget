@@ -413,9 +413,11 @@ void dumpFontList(Display *display, XmFontList fontList) {
 				break;
 		}
 		printf("%s\n", whatisit);
+		free(tag);
 
 		entry = XmFontListNextEntry(context);
 	}
+	XmFontListFreeFontContext(context);
 }
 
 /**
