@@ -359,7 +359,7 @@ void calculateWidgetDimensions(ClocksStruct *clocksStruct) {
 		clocksStruct->textAreaWidth = DEFAULT_TEXTAREA_WIDTH_A;
 		clocksStruct->label_x_offset = LABEL_X_OFFSET_A;
 		clocksStruct->label_y_offset = LABEL_Y_OFFSET_A;
-		clocksStruct->fontHeight = DEFAULT_FONT_HEIGHT_A;
+		clocksStruct->fontHeight = DEFAULT_FONT_HEIGHT_A - DEFAULT_FONT_HEIGHT_A%2;
 
 	} else {
 		clocksStruct->digitWidth = DEFAULT_DIGIT_WIDTH_B; // screen w / 64
@@ -367,7 +367,7 @@ void calculateWidgetDimensions(ClocksStruct *clocksStruct) {
 		clocksStruct->textAreaWidth = DEFAULT_TEXTAREA_WIDTH_B;
 		clocksStruct->label_x_offset = LABEL_X_OFFSET_B;
 		clocksStruct->label_y_offset = LABEL_Y_OFFSET_B;
-		clocksStruct->fontHeight = DEFAULT_FONT_HEIGHT_B;
+		clocksStruct->fontHeight = DEFAULT_FONT_HEIGHT_B + DEFAULT_FONT_HEIGHT_B%2;
 	}
 }
 
