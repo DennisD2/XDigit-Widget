@@ -178,6 +178,8 @@ xlsfonts
 ```
 See also own file ```listfonts.c``` .
 
+Also useful: https://linux.die.net/man/1/xfontsel
+
 To use a font, we need to load it. The font can be loaded by
 ```c++
 #define SOMEFONT "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
