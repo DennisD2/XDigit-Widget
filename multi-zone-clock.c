@@ -101,7 +101,8 @@ typedef struct {
 	Pixel background;
 	String labels;
 	Boolean showSeconds;
-	/*XFontStruct *fontStruct; */
+	XFontStruct *titleFont;
+	XFontStruct *dateFont;
 } Resources;
 
 static Resources theResources;
@@ -119,9 +120,12 @@ static XtResource resourceSpec[] = {
 	{ "showSeconds", XtCBoolean, XtRBoolean, sizeof(Boolean),
 	XtOffsetOf(Resources, showSeconds),
 	XtRString, "false"},
-	/*{ XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
-		XtOffsetOf(Resources, fontStruct),
-		XtRString, "XtDefaultFont"},*/
+	{ "titleFont", XtCFont, XtRFontStruct, sizeof(XFontStruct *),
+	XtOffsetOf(Resources, titleFont),
+	XtRString, "XtDefaultFont"},
+	{ "dateFont", XtCFont, XtRFontStruct, sizeof(XFontStruct *),
+	XtOffsetOf(Resources, dateFont),
+	XtRString, "XtDefaultFont"},
 };
 
 /*---------------------------*/
