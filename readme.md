@@ -254,7 +254,7 @@ XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
   to /usr/local/{include,lib}, because OpenMotif is installed there. Add these known specialties to
   Imakefile.
 * Make font well-readable even on low resolution display. This means find a good font, use bold style, and
-  whatever. On a Sunblade with 1024x78, the label font looks very thin vurrently.
+  whatever. On a Sunblade with 1024x78, the label font looks very thin currently.
 * Add display of numeric deviation from GMT for a timezone to label display. E.g. "GMT-4" and such.
 
 ## Further reading
