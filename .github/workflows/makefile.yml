@@ -27,5 +27,4 @@ jobs:
         run: |
           pwd 
           echo "----" 
-          imake -DLinuxArchitecture -DUseInstalled -I/usr/lib64/X11/config
           make all
