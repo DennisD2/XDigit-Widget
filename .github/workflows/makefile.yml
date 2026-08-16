@@ -17,7 +17,7 @@ jobs:
         run: |
           cat /etc/os-release
           zypper refresh
-          zypper install -y git gcc make
+          zypper install -y git gcc make imake xorg-cf-files
           zypper install -y libXt6 libXt-devel libXm4 motif-devel libX11-6 libX11-devel libXpm4 libXpm-devel
         
       - name: code checkout 
