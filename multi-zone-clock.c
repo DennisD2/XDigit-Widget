@@ -399,10 +399,10 @@ void dumpFontList(Display *display, XmFontList fontList) {
 				}
 				break;
 			case XmFONT_IS_FONTSET:
-				sprintf(whatisit, "FontSet %X", ret);
+				sprintf(whatisit, "FontSet %X", (unsigned int)ret);
 				break;
 			case XmFONT_IS_XFT:
-				sprintf(whatisit, "XFT(?) %X", ret);
+				sprintf(whatisit, "XFT(?) %X", (unsigned int)ret);
 				break;
 		}
 		printf("%s\n", whatisit);
