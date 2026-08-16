@@ -3,7 +3,6 @@ dial
 *.a
 /.idea
 *.bak
-Makefile
 /xdigit
 multi-zone-clock
 /listfonts
