@@ -499,6 +499,7 @@ int main(int argc, char **argv) {
 	} else {
 		sprintf(targetFont, "%s%d%s", SMALLFONT_1, clocksStruct.fontHeight, SMALLFONT_2);
 	}
+	printf("Target font: %s\n", targetFont);
 	XFontStruct *font_info = XLoadQueryFont(display, targetFont);
 	if (font_info == NULL) {
 		printf("No fonts\n");
