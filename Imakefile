@@ -1,14 +1,14 @@
 
 #include <widgets.tmpl>
 
-#ifdef OpenBSDArchitecture
+#ifndef LinuxArchitecture
 CCOPTIONS       =-Wall -I/usr/local/include
 #else
 CCOPTIONS       =-Wall
 #endif
 #INCLUDES        += 
 
-#ifdef OpenBSDArchitecture
+#ifndef LinuxArchitecture
 LDOPTIONS       += -L. -L/usr/local/lib
 #else
 LDOPTIONS       += -L.
