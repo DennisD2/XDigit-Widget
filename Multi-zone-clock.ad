@@ -16,4 +16,4 @@ multi-zone-clock.showSeconds: false
 multi-zone-clock.titleFont: -*-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1
 multi-zone-clock.dateFont:  -*-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1
 ! multi-zone-clock.titleFont: -adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1
-! multi-zone-clock.dateFont:  -*-*-bold-*-normal-*-24-*-*-*-*-*-iso8859-1
+! multi-zone-clock.dateFont:  -adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1
