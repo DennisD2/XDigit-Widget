@@ -43,8 +43,8 @@
 #define LABEL_X_OFFSET_B 15
 #define LABEL_Y_OFFSET_B 12
 
-#define SOMEFONT_A "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
-#define SOMEFONT_B "-*-bold-*-normal--16-*-*-*-*-*-iso8859-1"
+//#define SOMEFONT_A "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
+//#define SOMEFONT_B "-*-bold-*-normal--16-*-*-*-*-*-iso8859-1"
 
 static void setDateLabel(Widget date, int day, int month, int year);
 
@@ -68,7 +68,6 @@ typedef struct {
 
 	int numDigits; // calculated in main(), from showSeconds
 	int timeout; // calculated in setTimeoutValue()
-	XmFontList fontList;
 	int screenWidth;
 	int screenHeight;
 	int digitWidth;
@@ -76,7 +75,8 @@ typedef struct {
 	int textAreaWidth;
 	int label_x_offset;
 	int label_y_offset;
-	char *fontName;
+	XmFontList titleFontList;
+	XmFontList dateFontList;
 
 } ClocksStruct;
 
@@ -278,7 +278,7 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
 	XtSetArg( wargs[n], XtNx, (Position)clocksStruct.label_x_offset + clocksStruct.numDigits*clocksStruct.digitWidth); n++;
 	XtSetArg( wargs[n], XtNy, (Position)numClock*clocksStruct.digitHeight + clocksStruct.digitHeight/2 - clocksStruct.label_y_offset); n++;
-	XtSetArg( wargs[n], XmNfontList, clocksStruct.fontList ); n++;
+	XtSetArg( wargs[n], XmNfontList, clocksStruct.titleFontList ); n++;
 	*labelWidget = XtCreateManagedWidget("clockTitle", xmLabelWidgetClass, compo, wargs, n);
 	XmStringFree( xmstr );
 
@@ -287,7 +287,7 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 	XtSetArg( wargs[n], XmNlabelString, xmstr ); n++;
 	XtSetArg( wargs[n], XtNx, (Position)clocksStruct.label_x_offset + clocksStruct.numDigits*clocksStruct.digitWidth); n++;
 	XtSetArg( wargs[n], XtNy, (Position)numClock*clocksStruct.digitHeight + clocksStruct.digitHeight/2 + clocksStruct.label_y_offset/2 ); n++;
-	XtSetArg( wargs[n], XmNfontList, clocksStruct.fontList ); n++;
+	XtSetArg( wargs[n], XmNfontList, clocksStruct.dateFontList ); n++;
 	*dateWidget = XtCreateManagedWidget("clockDate", xmLabelWidgetClass, compo, wargs, n);
 	XmStringFree( xmstr );
 }
@@ -354,14 +354,60 @@ void calculateWidgetDimensions(ClocksStruct *clocksStruct) {
 		clocksStruct->textAreaWidth = DEFAULT_TEXTAREA_WIDTH_A;
 		clocksStruct->label_x_offset = LABEL_X_OFFSET_A;
 		clocksStruct->label_y_offset = LABEL_Y_OFFSET_A;
-		clocksStruct->fontName = SOMEFONT_A;
+
 	} else {
 		clocksStruct->digitWidth = DEFAULT_DIGIT_WIDTH_B; // screen w / 64
 		clocksStruct->digitHeight = DEFAULT_DIGIT_HEIGHT_B;
 		clocksStruct->textAreaWidth = DEFAULT_TEXTAREA_WIDTH_B;
 		clocksStruct->label_x_offset = LABEL_X_OFFSET_B;
 		clocksStruct->label_y_offset = LABEL_Y_OFFSET_B;
-		clocksStruct->fontName = SOMEFONT_B;
+	}
+}
+
+/**
+ * Dump all font names and other info from a XmFontList object
+ *
+ * @param display
+ * @param fontList
+ */
+void dumpFontList(Display *display, XmFontList fontList) {
+	XmFontContext context;
+	if (XmFontListInitFontContext(&context, fontList) == 0) {
+		printf("Cannot create XmFontListContext");
+	}
+	XmFontListEntry entry = XmFontListNextEntry(context);
+	while (entry != NULL) {
+		XmFontType fontType;
+		XPointer ret = XmFontListEntryGetFont(entry, &fontType);
+		char *tag = XmFontListEntryGetTag(entry);
+
+		char whatisit[256];
+		XFontStruct *font;
+		unsigned long value;
+		char *fontName;
+		switch (fontType) {
+			case XmFONT_IS_FONT:
+				font = (XFontStruct *)ret;
+				int fontHeight = font->ascent + font->descent;
+				int fontWidth  = font->max_bounds.width;
+				if (XGetFontProperty(font, XA_FONT, &value)) {
+					fontName = XGetAtomName(display, (Atom)value);
+					if (fontName != NULL) {
+						sprintf(whatisit, "Font, name: %s, tag: %s. char dimension hxw=%dx%d\n", fontName, tag,
+							fontHeight, fontWidth);
+					}
+				}
+				break;
+			case XmFONT_IS_FONTSET:
+				sprintf(whatisit, "FontSet %X", ret);
+				break;
+			case XmFONT_IS_XFT:
+				sprintf(whatisit, "XFT(?) %X", ret);
+				break;
+		}
+		printf("%s\n", whatisit);
+
+		entry = XmFontListNextEntry(context);
 	}
 }
 
@@ -437,13 +483,24 @@ int main(int argc, char **argv) {
 
 	/* Solution for Motif */
 	/* load font */
-	XFontStruct *font_info = XLoadQueryFont(display, clocksStruct.fontName);
+	/*XFontStruct *font_info = XLoadQueryFont(display, clocksStruct.fontName);
 	if (font_info == NULL) {
 		printf("No fonts\n");
-	}
+	}*/
+	XFontStruct *font_info = theResources.titleFont;
 	/* create a motif font list and store in global var for later use */
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
-	clocksStruct.fontList = fontList;
+	clocksStruct.titleFontList = fontList;
+
+	dumpFontList(display, fontList);
+
+	font_info = theResources.dateFont;
+	/* create a motif font list and store in global var for later use */
+	fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
+	clocksStruct.dateFontList = fontList;
+
+
+	dumpFontList(display, fontList);
 
 	//theResources.showSeconds=1;
 	if (theResources.showSeconds) {

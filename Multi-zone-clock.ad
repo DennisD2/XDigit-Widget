@@ -11,6 +11,8 @@ multi-zone-clock*clockDate.background: black
 multi-zone-clock.clockPanel.clockDate.foreground: red
 
 multi-zone-clock.clocks: Frankfurt=Local,GMT=GMT,New York=America/New_York
-multi-zone-clock.showSeconds: true
-multi-zone-clock.titleFont: "-*-bold-*-normal--16-*-*-*-*-*-iso8859-1"
-multi-zone-clock.dateFont:  "-*-bold-*-normal--16-*-*-*-*-*-iso8859-1"
+multi-zone-clock.showSeconds: false
+
+multi-zone-clock.titleFont: -*-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1
+! multi-zone-clock.titleFont: -adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1
+multi-zone-clock.dateFont:  -*-*-bold-*-normal-*-14-*-*-*-*-*-iso8859-1
