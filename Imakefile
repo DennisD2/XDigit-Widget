@@ -1,7 +1,7 @@
 
 #include <widgets.tmpl>
 
-#if defined(LinuxArchitecture) || !defined(OpenBSDArchitecture)
+#if !defined(OpenBSDArchitecture)
 CCOPTIONS       =-Wall
 #else
 CCOPTIONS       =-Wall -I/usr/local/include

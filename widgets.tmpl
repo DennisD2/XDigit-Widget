@@ -4,7 +4,7 @@
 
 CC              =   gcc
 
-#if defined(LinuxArchitecture) || !defined(OpenBSDArchitecture)
+#if !defined(OpenBSDArchitecture)
 CFLAGS          +=  -std=c17
 #else
 CFLAGS          +=
