@@ -29,18 +29,18 @@
 #define DIGIT_WIDGETS_NUM_WITH_SECONDS DIGIT_WIDGETS_NUM_NOSECONDS+3
 
 // widget geometries; these values should be calculated from screen dimensions; but for now, we offer
-// two geometries, small (_B) and large (_A), for small screens (<1500x1000) and large screens
+// two geometries, large (_A) and small (_B), for small screens (<1500x1000) and large screens
 // Also font size is handled in this way, but should be calculated (font size) from actual geometries
 #define DEFAULT_DIGIT_WIDTH_A 60
 #define DEFAULT_DIGIT_HEIGHT_A 100
-#define DEFAULT_TEXTAREA_WIDTH_A 200
+#define DEFAULT_TEXTAREA_WIDTH_A 210
 #define LABEL_X_OFFSET_A 15
 #define LABEL_Y_OFFSET_A 20
 #define DEFAULT_FONT_HEIGHT_A DEFAULT_DIGIT_HEIGHT_A/4
 
 #define DEFAULT_DIGIT_WIDTH_B 30
 #define DEFAULT_DIGIT_HEIGHT_B 50
-#define DEFAULT_TEXTAREA_WIDTH_B 100
+#define DEFAULT_TEXTAREA_WIDTH_B 105
 #define LABEL_X_OFFSET_B 15
 #define LABEL_Y_OFFSET_B 12
 #define DEFAULT_FONT_HEIGHT_B DEFAULT_DIGIT_HEIGHT_B/4
@@ -49,8 +49,6 @@
 #define LARGEFONT_2 "-240-75-75-m-150-iso8859-1"
 #define SMALLFONT_1 "-*-helvetica-bold-r-*-*-"
 #define SMALLFONT_2 "-*-*-*-*-*-iso8859-1"
-
-static void setDateLabel(Widget date, int day, int month, int year);
 
 /*---------------------------*/
 /* App Types definitions     */
@@ -95,7 +93,10 @@ typedef struct {
 	int day;
 	int month;
 	int year;
+	int gmtOffset;
 } DigitStruct;
+
+static void setDateLabel(Widget date, DigitStruct *digits);
 
 /*---------------------------*/
 /* App Resources definitions */
@@ -155,19 +156,29 @@ void setTimeoutValue(int newValue) {
  * Can return arbitrary remote "local" times. This feature is reached by manipulating TZ variable.
  */
 static void getCurrentTime(DigitStruct *digits, String zone) {
+	char zoneEnv[64];
+
+	// always get GMT time
+	snprintf(zoneEnv, sizeof(zoneEnv), "TZ=GMT");
+	struct tm *tt;
+	putenv(zoneEnv);
+	time_t t;
+	time( &t );
+	tt = gmtime(&t);
+	digits->gmtOffset = -tt->tm_hour;
+
+	// now clocks time
 	if (strcmp(zone, "Local") == 0) {
 		// No TZ required for our own local time
 		unsetenv("TZ");
 	} else {
 		// Manipulate TZ variable for reading local time for different time zones
 		char zoneEnv[64];
-		sprintf(zoneEnv, "TZ=%s", zone);
+		snprintf(zoneEnv, sizeof(zoneEnv), "TZ=%s", zone);
 		putenv(zoneEnv);
 	}
 
-	time_t t;
 	time( &t );
-	struct tm * tt;
 	tt = localtime(&t);
 	//printf("time: %s\n", asctime(tt));
 
@@ -177,7 +188,9 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 	digits->day = tt->tm_mday;
 	digits->month = tt->tm_mon;
 	digits->year = tt->tm_year +1900L;
-	//printf("h:m = %d:%d:%d\n", digits->h, digits->m, digits->s);
+
+	digits->gmtOffset += tt->tm_hour;;
+	//printf("h:m:s = %d:%d:%d, gmtOffset=%d\n", digits->h, digits->m, digits->s, digits->gmtOffset);
 }
 
 /*
@@ -210,7 +223,7 @@ static void setClockValue(const ClockStruct *clock) {
 		XtSetValues( clock->digit[7], args, 1 );
 	}
 
-	setDateLabel( clock->dateWidget, digits.day, digits.month, digits.year);
+	setDateLabel( clock->dateWidget, &digits);
 
 	// Optimize timeout value to match as good as possible the zero crossing of seconds value
 	// Not required if we have timeout every second:
@@ -304,10 +317,10 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
  * @param month date part
  * @param year date part
  */
-static void setDateLabel(Widget dateWidget, int day, int month, int year) {
+static void setDateLabel(Widget dateWidget, DigitStruct *d) {
 	Arg args[1];
 	char buf[32];
-	sprintf(buf, "%d.%d.%d", day, month, year);
+	sprintf(buf, "%d.%d.%d (%d)", d->day, d->month, d->year, d->gmtOffset);
 	XmString xmstr = XmStringCreate(buf, XmSTRING_DEFAULT_CHARSET);
 	XtSetArg( args[0], XmNlabelString, xmstr );
 	XtSetValues( dateWidget, args, 1 );
@@ -406,10 +419,10 @@ void dumpFontList(Display *display, XmFontList fontList) {
 				}
 				break;
 			case XmFONT_IS_FONTSET:
-				sprintf(whatisit, "FontSet %X", (unsigned int)ret);
+				sprintf(whatisit, "FontSet %lX", (unsigned long)ret);
 				break;
 			case XmFONT_IS_XFT:
-				sprintf(whatisit, "XFT(?) %X", (unsigned int)ret);
+				sprintf(whatisit, "XFT(?) %lX", (unsigned long)ret);
 				break;
 		}
 		printf("%s\n", whatisit);
