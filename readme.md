@@ -1,6 +1,8 @@
 ## 7 segment digit widget for X Windows
 This project contains the implementation of a 7 segment display widget.
 
+![mzc.png](doc/mzc.png)
+
 There is a test program called "xdigits" which uses 5 of these widgets to implement 
 a simple digital clock.
 
