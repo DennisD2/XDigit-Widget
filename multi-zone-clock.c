@@ -36,15 +36,19 @@
 #define DEFAULT_TEXTAREA_WIDTH_A 200
 #define LABEL_X_OFFSET_A 15
 #define LABEL_Y_OFFSET_A 20
+#define DEFAULT_FONT_HEIGHT_A DEFAULT_DIGIT_HEIGHT_A/4
 
 #define DEFAULT_DIGIT_WIDTH_B 30
 #define DEFAULT_DIGIT_HEIGHT_B 50
 #define DEFAULT_TEXTAREA_WIDTH_B 100
 #define LABEL_X_OFFSET_B 15
 #define LABEL_Y_OFFSET_B 12
+#define DEFAULT_FONT_HEIGHT_B DEFAULT_DIGIT_HEIGHT_B/4
 
-//#define SOMEFONT_A "-adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1"
-//#define SOMEFONT_B -*-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1
+#define LARGEFONT_1 "-adobe-courier-bold-r-normal--"
+#define LARGEFONT_2 "-240-75-75-m-150-iso8859-1"
+#define SMALLFONT_1 "-*-helvetica-bold-r-*-*-"
+#define SMALLFONT_2 "-*-*-*-*-*-iso8859-1"
 
 static void setDateLabel(Widget date, int day, int month, int year);
 
@@ -75,6 +79,7 @@ typedef struct {
 	int textAreaWidth;
 	int label_x_offset;
 	int label_y_offset;
+	int fontHeight;
 	XmFontList titleFontList;
 	XmFontList dateFontList;
 
@@ -354,6 +359,7 @@ void calculateWidgetDimensions(ClocksStruct *clocksStruct) {
 		clocksStruct->textAreaWidth = DEFAULT_TEXTAREA_WIDTH_A;
 		clocksStruct->label_x_offset = LABEL_X_OFFSET_A;
 		clocksStruct->label_y_offset = LABEL_Y_OFFSET_A;
+		clocksStruct->fontHeight = DEFAULT_FONT_HEIGHT_A;
 
 	} else {
 		clocksStruct->digitWidth = DEFAULT_DIGIT_WIDTH_B; // screen w / 64
@@ -361,6 +367,7 @@ void calculateWidgetDimensions(ClocksStruct *clocksStruct) {
 		clocksStruct->textAreaWidth = DEFAULT_TEXTAREA_WIDTH_B;
 		clocksStruct->label_x_offset = LABEL_X_OFFSET_B;
 		clocksStruct->label_y_offset = LABEL_Y_OFFSET_B;
+		clocksStruct->fontHeight = DEFAULT_FONT_HEIGHT_B;
 	}
 }
 
@@ -482,19 +489,36 @@ int main(int argc, char **argv) {
 	*/
 
 	/* Solution for Motif */
-	/* load font */
-	/*XFontStruct *font_info = XLoadQueryFont(display, clocksStruct.fontName);
+	// Next line: just use font loaded via ressource
+	//XFontStruct *font_info = theResources.titleFont;
+
+	// otherwise: try to calculate good fitting font
+	char targetFont[256];
+	if (clocksStruct.fontHeight == DEFAULT_FONT_HEIGHT_A) {
+		 sprintf(targetFont,"%s%d%s", LARGEFONT_1, clocksStruct.fontHeight, LARGEFONT_2);
+	} else {
+		sprintf(targetFont, "%s%d%s", SMALLFONT_1, clocksStruct.fontHeight, SMALLFONT_2);
+	}
+	XFontStruct *font_info = XLoadQueryFont(display, targetFont);
 	if (font_info == NULL) {
 		printf("No fonts\n");
-	}*/
-	XFontStruct *font_info = theResources.titleFont;
+	}
 	/* create a motif font list and store in global var for later use */
 	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	clocksStruct.titleFontList = fontList;
 
 	dumpFontList(display, fontList);
 
-	font_info = theResources.dateFont;
+	//font_info = theResources.dateFont;
+	if (clocksStruct.fontHeight == DEFAULT_FONT_HEIGHT_A) {
+		sprintf(targetFont,"%s%d%s", LARGEFONT_1, clocksStruct.fontHeight, LARGEFONT_2);
+	} else {
+		sprintf(targetFont, "%s%d%s", SMALLFONT_1, clocksStruct.fontHeight, SMALLFONT_2);
+	}
+	font_info = XLoadQueryFont(display, targetFont);
+	if (font_info == NULL) {
+		printf("No fonts\n");
+	}
 	/* create a motif font list and store in global var for later use */
 	fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
 	clocksStruct.dateFontList = fontList;
