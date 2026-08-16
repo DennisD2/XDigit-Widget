@@ -418,6 +418,79 @@ void dumpFontList(Display *display, XmFontList fontList) {
 	}
 }
 
+/**
+ * Load fonts for clock title and date string
+ * @param display
+ * @param clocks_struct
+ */
+void loadFonts(Display *display, ClocksStruct * clocks_struct) {
+	/*
+    For pure (non-Motif) we would do it like this:
+
+    #define DEFAULT_FONT_NAME     "*-*-*-*-*-*--*-*, -*"
+    char *base_font_name = DEFAULT_FONT_NAME;
+	char **missing_list;
+	int missing_count;
+	char *def_string;
+	XFontSet font_set = XCreateFontSet(display, base_font_name, &missing_list,
+							   &missing_count, &def_string);
+	if (missing_count > 0) {
+		fprintf(stderr, "The following charsets are missing: \n");
+		for (i=0; i<missing_count; i++)
+			fprintf(stderr, "%s \n", missing_list[i]);
+		XFreeStringList(missing_list);
+	}
+    XFontStruct **fonts;
+    char **names;
+	int num_fonts = XFontsOfFontSet( font_set, &fonts, &names);
+	for (i=0; i<num_fonts; i++) {
+		printf("Font[%d]: %s\n", i, names[i]);
+	}
+
+	Then we have a fontset and a font and may use that in some non-Motif widgets.
+	Motif uses an own resource named XmNfontList, so the solution looks different, see below
+	*/
+
+	/* Solution for Motif */
+	// Next line: simplest approach just use font loaded via resource
+	//XFontStruct *font_info = theResources.titleFont;
+
+	// We try another approach: try to calculate good fitting font
+	// clocksStruct.fontHeight was adjusted accoring to digit height, and now we use it
+	// to construct a font name with this height value
+	char targetFont[256];
+	if (clocksStruct.fontHeight == DEFAULT_FONT_HEIGHT_A) {
+		 sprintf(targetFont,"%s%d%s", LARGEFONT_1, clocksStruct.fontHeight, LARGEFONT_2);
+	} else {
+		sprintf(targetFont, "%s%d%s", SMALLFONT_1, clocksStruct.fontHeight, SMALLFONT_2);
+	}
+	printf("Target font: %s\n", targetFont);
+	// Try to load a fitting font
+	XFontStruct *font_info = XLoadQueryFont(display, targetFont);
+	if (font_info == NULL) {
+		printf("No fonts\n");
+	}
+	/* create a motif font list and store in global var for later use */
+	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
+	clocksStruct.titleFontList = fontList;
+	dumpFontList(display, fontList);
+
+	//font_info = theResources.dateFont;
+	if (clocksStruct.fontHeight == DEFAULT_FONT_HEIGHT_A) {
+		sprintf(targetFont,"%s%d%s", LARGEFONT_1, clocksStruct.fontHeight, LARGEFONT_2);
+	} else {
+		sprintf(targetFont, "%s%d%s", SMALLFONT_1, clocksStruct.fontHeight, SMALLFONT_2);
+	}
+	font_info = XLoadQueryFont(display, targetFont);
+	if (font_info == NULL) {
+		printf("No fonts\n");
+	}
+	/* create a motif font list and store in global var for later use */
+	fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
+	clocksStruct.dateFontList = fontList;
+	dumpFontList(display, fontList);
+}
+
 int main(int argc, char **argv) {
 	Arg args[8]; int i;
 
@@ -461,71 +534,8 @@ int main(int argc, char **argv) {
 	printf("Screen dimensions %dx%d\n", clocksStruct.screenWidth, clocksStruct.screenHeight);
 
 	calculateWidgetDimensions(&clocksStruct);
-/*
-    For pure (non-Motif) we would do it like this:
 
-    #define DEFAULT_FONT_NAME     "*-*-*-*-*-*--*-*, -*"
-    char *base_font_name = DEFAULT_FONT_NAME;
-	char **missing_list;
-	int missing_count;
-	char *def_string;
-	XFontSet font_set = XCreateFontSet(display, base_font_name, &missing_list,
-							   &missing_count, &def_string);
-	if (missing_count > 0) {
-		fprintf(stderr, "The following charsets are missing: \n");
-		for (i=0; i<missing_count; i++)
-			fprintf(stderr, "%s \n", missing_list[i]);
-		XFreeStringList(missing_list);
-	}
-    XFontStruct **fonts;
-    char **names;
-	int num_fonts = XFontsOfFontSet( font_set, &fonts, &names);
-	for (i=0; i<num_fonts; i++) {
-		printf("Font[%d]: %s\n", i, names[i]);
-	}
-
-	Then we have a fontset and a font and may use that in some non-Motif widgets.
-	Motif uses an own ressource named XmNfontList, so the solution looks different, see below
-	*/
-
-	/* Solution for Motif */
-	// Next line: just use font loaded via ressource
-	//XFontStruct *font_info = theResources.titleFont;
-
-	// otherwise: try to calculate good fitting font
-	char targetFont[256];
-	if (clocksStruct.fontHeight == DEFAULT_FONT_HEIGHT_A) {
-		 sprintf(targetFont,"%s%d%s", LARGEFONT_1, clocksStruct.fontHeight, LARGEFONT_2);
-	} else {
-		sprintf(targetFont, "%s%d%s", SMALLFONT_1, clocksStruct.fontHeight, SMALLFONT_2);
-	}
-	printf("Target font: %s\n", targetFont);
-	XFontStruct *font_info = XLoadQueryFont(display, targetFont);
-	if (font_info == NULL) {
-		printf("No fonts\n");
-	}
-	/* create a motif font list and store in global var for later use */
-	XmFontList fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
-	clocksStruct.titleFontList = fontList;
-
-	dumpFontList(display, fontList);
-
-	//font_info = theResources.dateFont;
-	if (clocksStruct.fontHeight == DEFAULT_FONT_HEIGHT_A) {
-		sprintf(targetFont,"%s%d%s", LARGEFONT_1, clocksStruct.fontHeight, LARGEFONT_2);
-	} else {
-		sprintf(targetFont, "%s%d%s", SMALLFONT_1, clocksStruct.fontHeight, SMALLFONT_2);
-	}
-	font_info = XLoadQueryFont(display, targetFont);
-	if (font_info == NULL) {
-		printf("No fonts\n");
-	}
-	/* create a motif font list and store in global var for later use */
-	fontList = XmFontListCreate(font_info, XmFONTLIST_DEFAULT_TAG);
-	clocksStruct.dateFontList = fontList;
-
-
-	dumpFontList(display, fontList);
+	loadFonts(display, &clocksStruct);
 
 	//theResources.showSeconds=1;
 	if (theResources.showSeconds) {
