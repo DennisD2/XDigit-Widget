@@ -80,8 +80,21 @@ multi-zone-clock*clockDate.background: black
 multi-zone-clock.clockPanel.clockDate.foreground: red
 
 multi-zone-clock.clocks: Frankfurt=Local,GMT=GMT,New York=America/New_York
-multi-zone-clock.showSeconds: true
+multi-zone-clock.showSeconds: false
+
+multi-zone-clock.titleFont: auto
+multi-zone-clock.dateFont:  auto
+! multi-zone-clock.titleFont: -*-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1
+! multi-zone-clock.dateFont:  -*-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1
+! multi-zone-clock.titleFont: -adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1
+! multi-zone-clock.dateFont:  -adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1
 ```
+Using a value "auto" for fonts means that a feasible font is calculated
+by the application. Note that some output "Warning: Cannot convert string "auto" to type FontStruct" comes
+at application startup, because this is a font resource and X tries to
+find the font "auto". Later, the application will adjust the font size
+to fit well to the applications size.
+
 
 Example result:
 
@@ -234,13 +247,13 @@ XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 * Make calculateWidgetDimensions() deriving all values from screen width and height by calculation.
   For a 4K screen, digit width = 1/64 of screen width. Something like this.
 * Add display of numeric deviation from GMT for a timezone to label display. E.g. "GMT-4" and such.
-* Make font well-readable even on low resolution display. This means find a good font, use bold style, and
-  whatever. On a Sunblade with 1024x78, the label font looks very thin vurrently.
 
 ## Resolved issues
 * Make Imakefile more generic. For example, on OpenBSD on a Sunblade, I needed to add "-I" and "-L" pointing
   to /usr/local/{include,lib}, because OpenMotif is installed there. Add these known specialties to
   Imakefile.
+* Make font well-readable even on low resolution display. This means find a good font, use bold style, and
+  whatever. On a Sunblade with 1024x78, the label font looks very thin vurrently.
 
 ## Further reading
 * Time zones - https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
