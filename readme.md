@@ -246,7 +246,6 @@ XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 ## Todos, open issues
 * Make calculateWidgetDimensions() deriving all values from screen width and height by calculation.
   For a 4K screen, digit width = 1/64 of screen width. Something like this.
-* Add display of numeric deviation from GMT for a timezone to label display. E.g. "GMT-4" and such.
 
 ## Resolved issues
 * Make Imakefile more generic. For example, on OpenBSD on a Sunblade, I needed to add "-I" and "-L" pointing
@@ -254,6 +253,7 @@ XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
   Imakefile.
 * Make font well-readable even on low resolution display. This means find a good font, use bold style, and
   whatever. On a Sunblade with 1024x78, the label font looks very thin vurrently.
+* Add display of numeric deviation from GMT for a timezone to label display. E.g. "GMT-4" and such.
 
 ## Further reading
 * Time zones - https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
