@@ -1,17 +1,17 @@
 
 #include <widgets.tmpl>
 
-#ifndef LinuxArchitecture
-CCOPTIONS       =-Wall -I/usr/local/include
-#else
+#if defined(LinuxArchitecture)
 CCOPTIONS       =-Wall
+#else
+CCOPTIONS       =-Wall -I/usr/local/include
 #endif
 #INCLUDES        += 
 
-#ifndef LinuxArchitecture
-LDOPTIONS       += -L. -L/usr/local/lib
-#else
+#if defined(LinuxArchitecture)
 LDOPTIONS       += -L.
+#else
+LDOPTIONS       += -L. -L/usr/local/lib
 #endif
 
 LOCAL_LIBRARIES = -lWidgets -lXm

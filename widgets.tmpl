@@ -4,10 +4,10 @@
 
 CC              =   gcc
 
-#ifndef LinuxArchitecture
-CFLAGS          +=
-#else
+#if defined(LinuxArchitecture)
 CFLAGS          +=  -std=c17
+#else
+CFLAGS          +=
 #endif
 
 CDEBUGFLAGS     =   -g
