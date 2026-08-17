@@ -93,7 +93,7 @@ typedef struct {
 	int day;
 	int month;
 	int year;
-	int gmtOffset;
+	int offsetToLocal;
 } DigitStruct;
 
 static void setDateLabel(Widget date, DigitStruct *digits);
@@ -158,22 +158,17 @@ void setTimeoutValue(int newValue) {
 static void getCurrentTime(DigitStruct *digits, String zone) {
 	char zoneEnv[64];
 
-	// always get GMT time
-	snprintf(zoneEnv, sizeof(zoneEnv), "TZ=GMT");
+	// always get local time
 	struct tm *tt;
-	putenv(zoneEnv);
+	unsetenv("TZ");
 	time_t t;
 	time( &t );
-	tt = gmtime(&t);
-	digits->gmtOffset = -tt->tm_hour;
+	tt = localtime(&t);
+	digits->offsetToLocal = -tt->tm_hour;
 
 	// now clocks time
-	if (strcmp(zone, "Local") == 0) {
-		// No TZ required for our own local time
-		unsetenv("TZ");
-	} else {
-		// Manipulate TZ variable for reading local time for different time zones
-		char zoneEnv[64];
+	// Manipulate TZ variable for reading local time for different time zones
+	if (strcmp(zone, "Local") != 0) {
 		snprintf(zoneEnv, sizeof(zoneEnv), "TZ=%s", zone);
 		putenv(zoneEnv);
 	}
@@ -189,7 +184,7 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 	digits->month = tt->tm_mon;
 	digits->year = tt->tm_year +1900L;
 
-	digits->gmtOffset += tt->tm_hour;;
+	digits->offsetToLocal += tt->tm_hour;;
 	//printf("h:m:s = %d:%d:%d, gmtOffset=%d\n", digits->h, digits->m, digits->s, digits->gmtOffset);
 }
 
@@ -320,7 +315,7 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 static void setDateLabel(Widget dateWidget, DigitStruct *d) {
 	Arg args[1];
 	char buf[32];
-	sprintf(buf, "%d.%d.%d (%d)", d->day, d->month, d->year, d->gmtOffset);
+	sprintf(buf, "%d.%d.%d (%d)", d->day, d->month, d->year, d->offsetToLocal);
 	XmString xmstr = XmStringCreate(buf, XmSTRING_DEFAULT_CHARSET);
 	XtSetArg( args[0], XmNlabelString, xmstr );
 	XtSetValues( dateWidget, args, 1 );
@@ -360,10 +355,6 @@ static int splitInfo(String info, String *parts) {
 	}
 	return i;
 }
-
-//#define LABEL_X_OFFSET 10+5
-//#define LABEL_Y_OFFSET 20
-
 
 void calculateWidgetDimensions(ClocksStruct *clocksStruct) {
 	if (clocksStruct->screenWidth > 1500 && clocksStruct->screenHeight > 1000) {
