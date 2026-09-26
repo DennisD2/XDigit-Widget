@@ -50,6 +50,8 @@
 #define LABEL_Y_OFFSET_B 12
 #define DEFAULT_FONT_HEIGHT_B DEFAULT_DIGIT_HEIGHT_B/4
 
+#define MOON_WIDTH 50
+
 #define LARGEFONT_1 "-adobe-courier-bold-r-normal--"
 #define LARGEFONT_2 "-240-75-75-m-150-iso8859-1"
 #define SMALLFONT_1 "-*-helvetica-bold-r-*-*-"
@@ -259,7 +261,7 @@ static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 }
 
 /**
- * Create all required digit widgets fopr a single clock row
+ * Create all required digit widgets for a single clock row
  * @param compo parent
  * @param clockDigits in/out parameter containinga ll created widgets
  * @param row clock row for we are creating new widgets
@@ -311,10 +313,19 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 	*dateWidget = XtCreateManagedWidget("clockDate", xmLabelWidgetClass, compo, wargs, n);
 	XmStringFree( xmstr );
 
-	char *pngFile = "moon.png";
-	int xpos = (Position)clocksStruct.label_x_offset + clocksStruct.numDigits*clocksStruct.digitWidth + 130;
-	int ypos = (Position)numClock*clocksStruct.digitHeight /*+ clocksStruct.digitHeight/2 - clocksStruct.label_y_offset*/;
-	Widget moonPhaseWidget = createMoonPhaseWidgets(compo, pngFile, xpos, ypos);
+
+	if (numClock==0) {
+		Dimension width;
+		n=0;
+		XtSetArg( wargs[n], XtNwidth, &width ); n++;
+		XtGetValues( compo, wargs, n );
+		printf("width = %d\n",width);
+
+		char *pngFile = "moon.png";
+		int xpos = (Position)width - MOON_WIDTH - 12;
+		int ypos = (Position)numClock*clocksStruct.digitHeight /*+ clocksStruct.digitHeight/2 - clocksStruct.label_y_offset*/;
+		Widget moonPhaseWidget = createMoonPhaseWidgets(compo, pngFile, xpos, ypos);
+	}
 }
 
 /**
@@ -706,7 +717,9 @@ int main(int argc, char **argv) {
      * Create a container widget for all the digits
      */
     int n = 0;
-    XtSetArg( args[n], XtNwidth, (Dimension)clocksStruct.numDigits*clocksStruct.digitWidth + clocksStruct.textAreaWidth ); n++;
+	Dimension width = (Dimension)clocksStruct.numDigits*clocksStruct.digitWidth
+		+ clocksStruct.textAreaWidth + MOON_WIDTH;
+    XtSetArg( args[n], XtNwidth, width ); n++;
     XtSetArg( args[n], XtNheight, (Dimension)numClocks*clocksStruct.digitHeight ); n++;
     Widget compo = XtCreateManagedWidget("clockPanel", compositeWidgetClass,
                                          toplevel, args, n);
