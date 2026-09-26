@@ -14,7 +14,7 @@ LDOPTIONS       += -L.
 LDOPTIONS       += -L. -L/usr/local/lib
 #endif
 
-LOCAL_LIBRARIES = -lWidgets -lXm -lXpm -lpng -lz
+LOCAL_LIBRARIES = -lWidgets -lXm -lXpm -lpng -lm
 #  EXTRA_DEFINES =
 EXTENSIONLIB     =
 #DEPLIBS         = $(DEPXLIB)
@@ -29,7 +29,7 @@ SRCS3 		    = listfonts.c
 
 OBJS          	= Digit.o
 OBJS1 		    = xdigit.o
-OBJS2 		    = multi-zone-clock.o
+OBJS2 		    = multi-zone-clock.o moonphase.o
 OBJS3 		    = listfonts.o
 
 PROGRAMS        = $(PROGRAM)
