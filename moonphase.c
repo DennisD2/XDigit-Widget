@@ -1,18 +1,15 @@
+
+#include "multi-zone-clock.h"
+#include "moonphase.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-// Definition der Datums-Struktur
-typedef struct {
-    int day;   // 1-31
-    int month; // 1-12
-    int year;  // z.B. 2026
-} Date;
-
 // Berechnet das Julianische Datum für den Mittag (12:00 UTC) des Tages
-double julianDate(Date d) {
-    int y = d.year;
-    int m = d.month;
+double julianDate(DigitStruct *d) {
+    int y = d->year;
+    int m = d->month;
 
     if (m <= 2) {
         y--;
@@ -23,7 +20,7 @@ double julianDate(Date d) {
     double a = floor((double)y / 100.0);
     double b = 2.0 - a + floor(a / 4.0);
 
-    double jd = floor(365.25 * (double)(y + 4716)) + floor(30.6001 * (double)(m + 1)) + (double)d.day + b - 1524.5;
+    double jd = floor(365.25 * (double)(y + 4716)) + floor(30.6001 * (double)(m + 1)) + (double)d->day + b - 1524.5;
     return jd;
 }
 
@@ -37,7 +34,7 @@ double toRad(double deg) {
 }
 
 // Berechnet das präzise Mondalter in Tagen (0 bis 29.53059) nach Jean Meeus
-double moonPhase(Date d) {
+double moonAge(DigitStruct *d) {
     double jd = julianDate(d);
 
     // T = Julianische Jahrhunderte seit J2000.0
@@ -74,34 +71,9 @@ double moonPhase(Date d) {
     return ageInDays;
 }
 
-int test_main(int argc, char *argv[]) {
-    // 1. Prüfen, ob ein Argument übergeben wurde
-    if (argc < 2) {
-        printf("Fehler: Bitte ein Datum im Format DD.MM.YYYY angeben.\n");
-        printf("Beispiel: %s 25.09.2026\n", argv[0]);
-        return 1;
-    }
-
-    Date d;
-    // 2. Den String parsen (entspricht fmt.Sscanf aus Go)
-    if (sscanf(argv[1], "%d.%d.%d", &d.day, &d.month, &d.year) != 3) {
-        printf("Fehler: Ungültiges Datumsformat. Erwartet wird DD.MM.YYYY\n");
-        return 1;
-    }
-
-    // 3. Einfache Validierung der Werte
-    if (d.month < 1 || d.month > 12 || d.day < 1 || d.day > 31) {
-        printf("Fehler: Ungültige Werte für Tag oder Monat.\n");
-        return 1;
-    }
-
-    // 4. Berechnung ausführen
-    double age = moonPhase(d);
-
-    printf("Mondalter am %02d.%02d.%d: %.2f Tage\n", d.day, d.month, d.year, age);
-
+void moonAgeToPhase(double age) {
     if (age < 1.5 || age > 28.0) {
-            printf("Phase: Neumond 🌑\n");
+        printf("Phase: Neumond 🌑\n");
     } else if (age >= 1.5 && age < 6.0) {
         printf("Phase: Erstes Viertel (Zunehmend) 🌒\n");
     } else if (age >= 6.0 && age < 9.0) {
@@ -117,5 +89,34 @@ int test_main(int argc, char *argv[]) {
     } else {
         printf("Phase: Letztes Viertel (Abnehmend) 🌘\n");
     }
+}
+
+int test_main(int argc, char *argv[]) {
+    // 1. Prüfen, ob ein Argument übergeben wurde
+    if (argc < 2) {
+        printf("Fehler: Bitte ein Datum im Format DD.MM.YYYY angeben.\n");
+        printf("Beispiel: %s 25.09.2026\n", argv[0]);
+        return 1;
+    }
+
+    DigitStruct d;
+    // 2. Den String parsen (entspricht fmt.Sscanf aus Go)
+    if (sscanf(argv[1], "%d.%d.%d", &d.day, &d.month, &d.year) != 3) {
+        printf("Fehler: Ungültiges Datumsformat. Erwartet wird DD.MM.YYYY\n");
+        return 1;
+    }
+
+    // 3. Einfache Validierung der Werte
+    if (d.month < 1 || d.month > 12 || d.day < 1 || d.day > 31) {
+        printf("Fehler: Ungültige Werte für Tag oder Monat.\n");
+        return 1;
+    }
+
+    // 4. Berechnung ausführen
+    double age = moonAge(&d);
+
+    printf("Mondalter am %02d.%02d.%d: %.2f Tage\n", d.day, d.month, d.year, age);
+
+    moonAgeToPhase(age);
     return 0;
 }

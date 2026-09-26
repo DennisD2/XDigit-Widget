@@ -2,6 +2,9 @@
  * multi-zone-clock.c : multi-zone digital clock
  *************************************************************/
 
+#include "multi-zone-clock.h"
+#include "moonphase.h"
+
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/Composite.h>
@@ -87,23 +90,15 @@ typedef struct {
 	int fontHeight;
 	XmFontList titleFontList;
 	XmFontList dateFontList;
-
+	Widget moonPhaseWidget;
+	double moonPhase;
 } ClocksStruct;
 
 // global static variable for all clocks
 static ClocksStruct clocksStruct;
 
-typedef struct {
-	int h;
-	int m;
-	int s;
-	int day;
-	int month;
-	int year;
-	int offsetToLocal;
-} DigitStruct;
-
 static void setDateLabel(Widget date, DigitStruct *digits);
+void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
 
 /*---------------------------*/
 /* App Resources definitions */
@@ -200,7 +195,7 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 /*
  * Set all widgets value resources to current time/date value. Includes digits and date widget.
  */
-static void setClockValue(const ClockStruct *clock) {
+static void setClockValue(ClocksStruct *allClocks, const ClockStruct *clock) {
 	Arg args[1];
 	DigitStruct digits;
 
@@ -228,6 +223,7 @@ static void setClockValue(const ClockStruct *clock) {
 	}
 
 	setDateLabel( clock->dateWidget, &digits);
+	setMoonPhasePixmap(allClocks, allClocks->moonPhaseWidget, &digits);
 
 	// Optimize timeout value to match as good as possible the zero crossing of seconds value
 	// Not required if we have timeout every second:
@@ -251,7 +247,7 @@ static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	ClocksStruct *clockStruct  = (ClocksStruct *)client_data;
 
 	for (int i=0; i<clockStruct->numClocks; i++) {
-		setClockValue(&clockStruct->clocks[i]);
+		setClockValue(&clocksStruct, &clockStruct->clocks[i]);
 	}
 
 	/*
@@ -292,7 +288,8 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
  * @param labelWidget returns created widget
  * @param dateWidget returns created widget
  */
-static void createClockLabelWidgets(Widget compo, int numClock, char* title, Widget *labelWidget, Widget *dateWidget) {
+static void createClockLabelWidgets(Widget compo, int numClock, char* title, Widget *labelWidget, Widget *dateWidget,
+	Widget *moonPhaseWidget) {
 	Arg wargs[7];
 	int n=0;
 
@@ -313,18 +310,24 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 	*dateWidget = XtCreateManagedWidget("clockDate", xmLabelWidgetClass, compo, wargs, n);
 	XmStringFree( xmstr );
 
-
 	if (numClock==0) {
 		Dimension width;
 		n=0;
 		XtSetArg( wargs[n], XtNwidth, &width ); n++;
 		XtGetValues( compo, wargs, n );
-		printf("width = %d\n",width);
 
 		char *pngFile = "moon.png";
 		int xpos = (Position)width - MOON_WIDTH - 12;
 		int ypos = (Position)numClock*clocksStruct.digitHeight /*+ clocksStruct.digitHeight/2 - clocksStruct.label_y_offset*/;
-		Widget moonPhaseWidget = createMoonPhaseWidgets(compo, pngFile, xpos, ypos);
+		*moonPhaseWidget = createMoonPhaseWidgets(compo, pngFile, xpos, ypos);
+	}
+}
+
+void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) {
+	double phase = moonAge(d);
+	if (phase != allClocks->moonPhase) {
+		allClocks->moonPhase = phase;
+		moonAgeToPhase(phase);
 	}
 }
 
@@ -728,7 +731,9 @@ int main(int argc, char **argv) {
      * Create all digit widgets and title+date widgets per clock
      */
 	for ( i=0; i<numClocks; i++ ) {
-		createClockLabelWidgets(compo,i, labels[i], &(clocksStruct.clocks[i].labelWidget), &(clocksStruct.clocks[i].dateWidget));
+		createClockLabelWidgets(compo,i, labels[i], &(clocksStruct.clocks[i].labelWidget),
+			&(clocksStruct.clocks[i].dateWidget),
+			&(clocksStruct.moonPhaseWidget));
 		createClockWidgets(compo, &clocksStruct.clocks[i], i);
 	}
 
