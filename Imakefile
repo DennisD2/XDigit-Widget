@@ -14,7 +14,7 @@ LDOPTIONS       += -L.
 LDOPTIONS       += -L. -L/usr/local/lib
 #endif
 
-LOCAL_LIBRARIES = -lWidgets -lXm
+LOCAL_LIBRARIES = -lWidgets -lXm -lXpm -lpng -lz
 #  EXTRA_DEFINES =
 EXTENSIONLIB     =
 #DEPLIBS         = $(DEPXLIB)
