@@ -91,6 +91,40 @@ void moonAgeToPhase(double age) {
     }
 }
 
+char *pngFiles[] = {
+    "questionmark.png",
+    "moon-1-full.png",
+    "moon-2-waxgib.png",
+    "moon-3-1st-q.png",
+    "moon-4-waxcres.png",
+    "moon-5-new.png",
+    "moon-6-wancres.png",
+    "moon-7-last-q.png",
+    "moon-8-wangib.png",
+};
+
+char *moonAgeToPixmapName(double age) {
+    int i=0;
+    if (age < 1.5 || age > 28.0) {
+        i=5;
+    } else if (age >= 1.5 && age < 6.0) {
+        i=6;
+    } else if (age >= 6.0 && age < 9.0) {
+        i=7;
+    } else if (age >= 9.0 && age < 13.5) {
+        i=8;
+    } else if (age >= 13.5 && age < 16.0) {
+        i=1;
+    } else if (age >= 16.0 && age < 20.5) {
+        i=2;
+    } else if (age >= 20.5 && age < 23.5) {
+        i=3;
+    } else {
+        i=4;
+    }
+    return pngFiles[i];
+}
+
 int test_main(int argc, char *argv[]) {
     // 1. Prüfen, ob ein Argument übergeben wurde
     if (argc < 2) {
