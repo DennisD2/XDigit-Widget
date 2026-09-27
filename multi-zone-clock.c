@@ -333,23 +333,11 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 		moonAgeToPhase(age);
 		pixmapFile = moonAgeToPixmapName(age);
 		printf("pixmap file name: %s\n", pixmapFile);
-		int status;
-		XpmAttributes attributes;
-		Pixmap pix = None;
-		Pixmap mask = None;
-		Pixel bg_color;
-		XtVaGetValues ( moon,
-				XmNdepth,    &attributes.depth,
-				XmNcolormap, &attributes.colormap,
-				XmNbackground, &bg_color,
-				NULL);
-		unsigned char bg_r = (bg_color >> 16) & 0xFF;
-		unsigned char bg_g = (bg_color >> 8)  & 0xFF;
-		unsigned char bg_b =  bg_color        & 0xFF;
-		attributes.visual = DefaultVisual ( XtDisplay(moon), DefaultScreen ( XtDisplay(moon) ) );
-		attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
-		pix = loadPixmapFromPngFile(pixmapFile, &status, moon);
 
+		int status;
+		// load pixmap from png file
+		Pixmap pix = loadPixmapFromPngFile(pixmapFile, &status, moon);
+		// set pixmap in moonphase widget
 		XtVaSetValues(moon,
 					 XmNlabelType, XmPIXMAP,
 					 XmNlabelPixmap, pix,
