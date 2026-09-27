@@ -186,8 +186,8 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 	digits->h = tt->tm_hour;
 	digits->m = tt->tm_min;
 	digits->s = tt->tm_sec;
-	digits->day = tt->tm_mday;
-	digits->month = tt->tm_mon + 1; // tt is range 0-11
+	digits->day = tt->tm_mday; // tt has range 1-31
+	digits->month = tt->tm_mon + 1; // tt has range 0-11
 	digits->year = tt->tm_year + 1900L; // tt has offset -1900
 
 	digits->offsetToLocal += tt->tm_hour;;
