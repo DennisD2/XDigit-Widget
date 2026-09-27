@@ -102,7 +102,7 @@ static void setDateLabel(Widget date, DigitStruct *digits);
 void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
 
 Pixmap loadPixmapFromPngFile(char *pngFile, XpmAttributes attributes, Pixmap mask,
-	Display *dpy, int *status, Widget w,
+	int *status, Widget w,
 	unsigned char bg_r, unsigned char bg_g, unsigned char bg_b,
 	Widget *value) ;
 /*---------------------------*/
@@ -351,7 +351,7 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 		unsigned char bg_b =  bg_color        & 0xFF;
 		attributes.visual = DefaultVisual ( XtDisplay(moon), DefaultScreen ( XtDisplay(moon) ) );
 		attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
-		pix = loadPixmapFromPngFile(pixmapFile, attributes, mask, XtDisplay(moon), &status, moon,
+		pix = loadPixmapFromPngFile(pixmapFile, attributes, mask, &status, moon,
 			bg_r, bg_g,bg_b, &moon);
 
 		XtVaSetValues(moon,
@@ -554,7 +554,7 @@ void loadFonts(Display *display, ClocksStruct * clocks_struct) {
 }
 
 Pixmap loadPixmapFromPngFile(char *pngFile, XpmAttributes attributes, Pixmap mask,
-	Display *dpy, int *status, Widget w,
+	int *status, Widget w,
 	unsigned char bg_r, unsigned char bg_g, unsigned char bg_b,
 	Widget *value) {
 
@@ -567,6 +567,7 @@ Pixmap loadPixmapFromPngFile(char *pngFile, XpmAttributes attributes, Pixmap mas
 		return 0;
 	}
 
+	Display *dpy = XtDisplay(w);
 	// Initialize libpng
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr) { fclose(fp); *value = w;
@@ -693,7 +694,7 @@ Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
 	attributes.visual = DefaultVisual ( dpy, DefaultScreen ( dpy ) );
 	attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
 	Widget value;
-	pix = loadPixmapFromPngFile(pngFile, attributes, mask, dpy, &status, w, bg_r, bg_g, bg_b, &value);
+	pix = loadPixmapFromPngFile(pngFile, attributes, mask, &status, w, bg_r, bg_g, bg_b, &value);
 	if (status!=XpmSuccess) {
 		return value;
 	}
