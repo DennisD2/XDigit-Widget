@@ -19,3 +19,7 @@ multi-zone-clock.dateFont:  auto
 ! multi-zone-clock.dateFont:  -*-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1
 ! multi-zone-clock.titleFont: -adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1
 ! multi-zone-clock.dateFont:  -adobe-courier-bold-r-normal--24-240-75-75-m-150-iso8859-1
+
+multi-zone-clock*phaseInfo_popop.font: -Adobe-Helvetica-Bold-R-Normal--24-240-75-75-P-138-ISO8859-1
+multi-zone-clock*phaseInfo_popup.fontList: -Adobe-Helvetica-Bold-R-Normal--24-240-75-75-P-138-ISO8859-1
+
