@@ -119,6 +119,17 @@ The code has flaws, being not I18N correct. It displays some text in
 english, other in german. It would be good to move all these texts into
 resource file [Multi-zone-clock.ad](./Multi-zone-clock.ad).
 
+Moon phases:
+* ![moon-1-full.png](moons/moon-1-full.png) Full moon
+* ![moon-2-waxgib.png](moons/moon-2-waxgib.png) Waxing Gibbous
+* ![moon-3-1st-q.png](moons/moon-3-1st-q.png) First Quarter
+* ![moon-4-waxcres.png](moons/moon-4-waxcres.png) Waxing Crescent
+* ![moon-5-new.png](moons/moon-5-new.png) New moon
+* ![moon-6-wancres.png](moons/moon-6-wancres.png) Waning Crescent
+* ![moon-7-last-q.png](moons/moon-7-last-q.png) Last Quarter
+* ![moon-8-wangib.png](moons/moon-8-wangib.png) Waning Gibbous
+* ![questionmark.png](moons/questionmark.png) (unknown phase)
+
 ## Install Motif libs+includes (OpenSuse)
 Using default OpenSuse packaging tooling, the following libs are needed for OSF/Motif:
 
@@ -282,3 +293,5 @@ XtSetArg( wargs[n], XtNbackground, theResources.background ); n++;
 * Xt fonts and fontsets - https://ftp.zx.net.nz/rom/V4.0Fr1229_D1/DOCS/HTML/AQ0R4DTE/CRTGCHXX.HTM
 * Xt Intrinsics manual - https://ftpmirror.your.org/pub/misc/bitsavers/pdf/hp/9000_hpux/x11/98794-90008_Programming_With_the_Xt_Intrinsics_Sep89.pdf
 * Motif infos - https://en.wikipedia.org/wiki/Motif_(software)
+* <a href="https://www.freeiconspng.com/img/1147">Question Mark Button Icon Free Clip Art</a>
+* Moon Phase images from https://www.magnific.com/premium-vector/phases-moon_3209253.htm
