@@ -2,18 +2,27 @@
  * multi-zone-clock.c : multi-zone digital clock
  *************************************************************/
 
+#include "multi-zone-clock.h"
+#include "moonphase.h"
+
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/Composite.h>
 
 #include <Xm/Xm.h>
 #include <Xm/Label.h>
+#include <Xm/PushB.h>
+
+#include <X11/xpm.h>
+#include "png.h"
+#include "zlib.h"
 
 #include "Digit.h"
 
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 /*---------------------------*/
 /* App defines               */
@@ -44,6 +53,8 @@
 #define LABEL_X_OFFSET_B 15
 #define LABEL_Y_OFFSET_B 12
 #define DEFAULT_FONT_HEIGHT_B DEFAULT_DIGIT_HEIGHT_B/4
+
+#define MOON_WIDTH 50
 
 #define LARGEFONT_1 "-adobe-courier-bold-r-normal--"
 #define LARGEFONT_2 "-240-75-75-m-150-iso8859-1"
@@ -80,23 +91,17 @@ typedef struct {
 	int fontHeight;
 	XmFontList titleFontList;
 	XmFontList dateFontList;
-
+	Widget moonPhaseWidget;
+	double moonAge;
 } ClocksStruct;
 
 // global static variable for all clocks
 static ClocksStruct clocksStruct;
 
-typedef struct {
-	int h;
-	int m;
-	int s;
-	int day;
-	int month;
-	int year;
-	int offsetToLocal;
-} DigitStruct;
-
 static void setDateLabel(Widget date, DigitStruct *digits);
+Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y);
+static void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
+static Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) ;
 
 /*---------------------------*/
 /* App Resources definitions */
@@ -139,7 +144,7 @@ static XtResource resourceSpec[] = {
 /*---------------------------*/
 
 // Set timeout value either to default or a new value
-void setTimeoutValue(int newValue) {
+static void setTimeoutValue(int newValue) {
 	if (newValue == TIMEOUT_DEFAULT) {
 		if (theResources.showSeconds) {
 			clocksStruct.timeout = TIMEOUT_WITH_SECONDS;
@@ -191,7 +196,7 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 /*
  * Set all widgets value resources to current time/date value. Includes digits and date widget.
  */
-static void setClockValue(const ClockStruct *clock) {
+static void setClockValue(ClocksStruct *allClocks, const ClockStruct *clock) {
 	Arg args[1];
 	DigitStruct digits;
 
@@ -219,6 +224,7 @@ static void setClockValue(const ClockStruct *clock) {
 	}
 
 	setDateLabel( clock->dateWidget, &digits);
+	setMoonPhasePixmap(allClocks, allClocks->moonPhaseWidget, &digits);
 
 	// Optimize timeout value to match as good as possible the zero crossing of seconds value
 	// Not required if we have timeout every second:
@@ -242,7 +248,7 @@ static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 	ClocksStruct *clockStruct  = (ClocksStruct *)client_data;
 
 	for (int i=0; i<clockStruct->numClocks; i++) {
-		setClockValue(&clockStruct->clocks[i]);
+		setClockValue(&clocksStruct, &clockStruct->clocks[i]);
 	}
 
 	/*
@@ -252,7 +258,7 @@ static void TimeoutCB( XtPointer client_data, XtIntervalId* id ) {
 }
 
 /**
- * Create all required digit widgets fopr a single clock row
+ * Create all required digit widgets for a single clock row
  * @param compo parent
  * @param clockDigits in/out parameter containinga ll created widgets
  * @param row clock row for we are creating new widgets
@@ -283,7 +289,8 @@ static void createClockWidgets(Widget compo, ClockStruct *clockDigits, int row) 
  * @param labelWidget returns created widget
  * @param dateWidget returns created widget
  */
-static void createClockLabelWidgets(Widget compo, int numClock, char* title, Widget *labelWidget, Widget *dateWidget) {
+static void createClockLabelWidgets(Widget compo, int numClock, char* title, Widget *labelWidget, Widget *dateWidget,
+	Widget *moonPhaseWidget) {
 	Arg wargs[7];
 	int n=0;
 
@@ -303,6 +310,45 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 	XtSetArg( wargs[n], XmNfontList, clocksStruct.dateFontList ); n++;
 	*dateWidget = XtCreateManagedWidget("clockDate", xmLabelWidgetClass, compo, wargs, n);
 	XmStringFree( xmstr );
+
+	if (numClock==0) {
+		Dimension width;
+		n=0;
+		XtSetArg( wargs[n], XtNwidth, &width ); n++;
+		XtGetValues( compo, wargs, n );
+
+		char *pngFile = "questionmark.png";
+		int xpos = (Position)width - MOON_WIDTH - 12;
+		int ypos = (Position)numClock*clocksStruct.digitHeight /*+ clocksStruct.digitHeight/2 - clocksStruct.label_y_offset*/;
+		*moonPhaseWidget = createMoonPhaseWidgets(compo, pngFile, xpos, ypos);
+	}
+}
+
+/**
+ * Load and set pixmap for moonphase widget based on moon age / current date
+ * @param allClocks clocks structure to use
+ * @param moon widget for dsplaying moon phase pixmaps
+ * @param d date to be used to calculate moon age
+ */
+void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) {
+	double age = moonAge(d);
+	if (age != allClocks->moonAge) {
+		// moon age has changed
+		allClocks->moonAge = age;
+		moonAgeToPhase(age);
+		//printf("pixmap file name: %s\n", pixmapFile);
+
+		// calculate file name based on moon age
+		char *pixmapFile = moonAgeToPixmapName(age);
+		// load pixmap from png file
+		int status;
+		Pixmap pix = loadPixmapFromPngFile(pixmapFile, &status, moon);
+		// set pixmap in moonphase widget
+		XtVaSetValues(moon,
+					 XmNlabelType, XmPIXMAP,
+					 XmNlabelPixmap, pix,
+					 NULL);
+	}
 }
 
 /**
@@ -497,6 +543,168 @@ void loadFonts(Display *display, ClocksStruct * clocks_struct) {
 	dumpFontList(display, fontList);
 }
 
+/**
+ *
+ * @param pngFile Name of PNG file to load
+ * @param status pointer to integer, will contain status after call
+ * @param w widget for that the pixmap is being loaded. Needed to set background/transparency.
+ * @return status==XpmSuccess on success. Then, return value is a valid pixmap.
+ */
+Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
+
+	printf("Open file %s\n", pngFile);
+	// Open PNG file
+	FILE *fp = fopen(pngFile, "rb");
+	if (!fp) {
+		fprintf(stderr, "Error opening file %s\n", pngFile);
+		return None;
+	}
+
+	// set up attributes struct
+	Display *dpy = XtDisplay(w);
+	XpmAttributes attributes;
+	Pixel bg_color;
+	XtVaGetValues ( w,
+					XmNdepth,    &attributes.depth,
+					XmNcolormap, &attributes.colormap,
+					XmNbackground, &bg_color,
+					NULL);
+	attributes.visual = DefaultVisual ( dpy, DefaultScreen ( dpy ) );
+	attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
+	// get background R,G,B values
+	unsigned char bg_r = (bg_color >> 16) & 0xFF;
+	unsigned char bg_g = (bg_color >> 8)  & 0xFF;
+	unsigned char bg_b =  bg_color        & 0xFF;
+
+	// Initialize libpng
+	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (!png_ptr) {
+		fclose(fp);
+		return None;
+	}
+
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr) {
+		png_destroy_read_struct(&png_ptr, NULL, NULL);
+		fclose(fp);
+		return None;
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		return None;
+	}
+
+	png_init_io(png_ptr, fp);
+	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, NULL);
+	fclose(fp);
+
+	int width = png_get_image_width(png_ptr, info_ptr);
+	int height = png_get_image_height(png_ptr, info_ptr);
+	png_bytep *row_pointers = png_get_rows(png_ptr, info_ptr);
+	int channels = png_get_channels(png_ptr, info_ptr);
+
+	// Set up XPM array
+	int num_colors = width * height;
+	int xpm_lines = 1 + num_colors + height;
+	char **xpm_data = malloc(xpm_lines * sizeof(char *));
+
+	int tokenSize = 4; // 4 is enough for smaller icons
+	// write header line
+	xpm_data[0] = malloc(50);
+	sprintf(xpm_data[0], "%d %d %d %d", width, height, num_colors, tokenSize);
+
+	// create color palette and pixel array
+	int color_index = 0;
+	for (int y = 0; y < height; y++) {
+		xpm_data[1 + num_colors + y] = malloc(width * tokenSize + 1);
+		xpm_data[1 + num_colors + y][0] = '\0';
+
+		for (int x = 0; x < width; x++) {
+			png_bytep px = &(row_pointers[y][x * channels]);
+			unsigned char r = px[0];
+			unsigned char g = px[1];
+			unsigned char b = px[2];
+
+			// create char token for xpm
+			char token[6];
+			if (tokenSize == 5) {
+				sprintf(token, "%c%c%c%c%c",
+				        'a' + (color_index / 456976) % 26,
+				        'a' + (color_index / 17576) % 26,
+				        'a' + (color_index / 676) % 26,
+				        'a' + (color_index / 26) % 26,
+				        'a' + color_index % 26);
+			} else if (tokenSize == 4) {
+				sprintf(token, "%c%c%c%c",
+				        'a' + (color_index / 17576) % 26,
+				        'a' + (color_index / 676) % 26,
+				        'a' + (color_index / 26) % 26,
+				        'a' + color_index % 26);
+			}
+
+			xpm_data[1 + color_index] = malloc(50);
+
+			// get alpha value (if available) and normalize 0.0..1,0
+			float alpha = (channels == 4) ? (px[3] / 255.0f) : 1.0f;
+
+			// alpha = 0 -> draw background
+			// alpha = 1 -> draw pixel
+			// alpha in between: mix in some transparency
+			unsigned char final_r = (unsigned char)(r * alpha + bg_r * (1.0f - alpha));
+			unsigned char final_g = (unsigned char)(g * alpha + bg_g * (1.0f - alpha));
+			unsigned char final_b = (unsigned char)(b * alpha + bg_b * (1.0f - alpha));
+
+			sprintf(xpm_data[1 + color_index], "%s c #%02X%02X%02X", token, final_r, final_g, final_b);
+
+			// add token
+			strcat(xpm_data[1 + num_colors + y], token);
+			color_index++;
+		}
+	}
+
+	// create Pixmap from data
+	Pixmap pix;
+	Pixmap mask = None;
+	*status = XpmCreatePixmapFromData(dpy, DefaultRootWindow(dpy),
+	                                  xpm_data, &pix, &mask, &attributes);
+
+	// cleanup
+	for (int i = 0; i < xpm_lines; i++) {
+		free(xpm_data[i]);
+	}
+	free(xpm_data);
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
+	return pix;
+}
+
+Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
+	Arg args[2];
+	XtSetArg( args[0], XmNx, x );
+	XtSetArg( args[1], XmNy, y );
+	Widget w = XtCreateManagedWidget("moonPhase", xmPushButtonWidgetClass, parent, args, 2);
+
+	int status;
+	Pixmap pix = loadPixmapFromPngFile(pngFile, &status, w);
+	if (status != XpmSuccess) {
+		return w;
+	}
+
+	// set pixmap for widget
+    if (status == XpmSuccess && pix != None) {
+        XtVaSetValues(w,
+                      XmNlabelType, XmPIXMAP,
+                      XmNlabelPixmap, pix,
+                      NULL);
+
+    } else {
+        fprintf(stderr, "XPM error cannot create pixmap (status code: %d).\n", status);
+    }
+    return w;
+}
+
 int main(int argc, char **argv) {
 	Arg args[8]; int i;
 
@@ -555,7 +763,9 @@ int main(int argc, char **argv) {
      * Create a container widget for all the digits
      */
     int n = 0;
-    XtSetArg( args[n], XtNwidth, (Dimension)clocksStruct.numDigits*clocksStruct.digitWidth + clocksStruct.textAreaWidth ); n++;
+	Dimension width = (Dimension)clocksStruct.numDigits*clocksStruct.digitWidth
+		+ clocksStruct.textAreaWidth + MOON_WIDTH;
+    XtSetArg( args[n], XtNwidth, width ); n++;
     XtSetArg( args[n], XtNheight, (Dimension)numClocks*clocksStruct.digitHeight ); n++;
     Widget compo = XtCreateManagedWidget("clockPanel", compositeWidgetClass,
                                          toplevel, args, n);
@@ -564,7 +774,9 @@ int main(int argc, char **argv) {
      * Create all digit widgets and title+date widgets per clock
      */
 	for ( i=0; i<numClocks; i++ ) {
-		createClockLabelWidgets(compo,i, labels[i], &(clocksStruct.clocks[i].labelWidget), &(clocksStruct.clocks[i].dateWidget));
+		createClockLabelWidgets(compo,i, labels[i], &(clocksStruct.clocks[i].labelWidget),
+			&(clocksStruct.clocks[i].dateWidget),
+			&(clocksStruct.moonPhaseWidget));
 		createClockWidgets(compo, &clocksStruct.clocks[i], i);
 	}
 
