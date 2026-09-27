@@ -337,20 +337,24 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 	double age = moonAge(d);
 	if (age != allClocks->moonAge) {
 		// moon age has changed
-		allClocks->moonAge = age;
 		char *str = moonAgeToPhase(age);
 		printf("Moon age: %s\n", str);
+		// get old pixmap file name for if condition
+		char *oldPixmapFile = moonAgeToPixmapName(allClocks->moonAge);
+		allClocks->moonAge = age;
 
-		// calculate file name based on moon age
+		// calculate new file name based on moon age
 		char *pixmapFile = moonAgeToPixmapName(age);
-		// load pixmap from png file
-		int status;
-		Pixmap pix = loadPixmapFromPngFile(pixmapFile, &status, moon);
-		// set pixmap in moonphase widget
-		XtVaSetValues(moon,
-					 XmNlabelType, XmPIXMAP,
-					 XmNlabelPixmap, pix,
-					 NULL);
+		if (strcmp(pixmapFile, oldPixmapFile) != 0) {
+			// load pixmap from png file, but only if we have to load a new file
+			int status;
+			Pixmap pix = loadPixmapFromPngFile(pixmapFile, &status, moon);
+			// set pixmap in moonphase widget
+			XtVaSetValues(moon,
+						 XmNlabelType, XmPIXMAP,
+						 XmNlabelPixmap, pix,
+						 NULL);
+		}
 	}
 }
 
