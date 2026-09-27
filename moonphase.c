@@ -91,16 +91,19 @@ void moonAgeToPhase(double age) {
     }
 }
 
+// waning=abnehmend , waxing=zunehmend
+// Crescent=Sichel, Gibbous=Dreiviertelmond
+// related to light part of moon
 char *pngFiles[] = {
     "questionmark.png",
-    "moon-1-full.png",
-    "moon-2-waxgib.png",
-    "moon-3-1st-q.png",
-    "moon-4-waxcres.png",
-    "moon-5-new.png",
-    "moon-6-wancres.png",
-    "moon-7-last-q.png",
-    "moon-8-wangib.png",
+    "moon-1-full.png",    /* Vollmond */
+    "moon-2-waxgib.png",  /* zunehmender Dreiviertelmond */
+    "moon-3-1st-q.png",   /* Erstes Viertel */
+    "moon-4-waxcres.png", /* Zunehmender Sichelmond */
+    "moon-5-new.png",     /* Neumomd */
+    "moon-6-wancres.png", /* Abnehmender Sichelmond */
+    "moon-7-last-q.png",  /* Letztes Viertel */
+    "moon-8-wangib.png",  /* Abnehmender 3/4 Mond */
 };
 
 char *moonAgeToPixmapName(double age) {
