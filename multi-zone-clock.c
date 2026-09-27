@@ -101,7 +101,7 @@ static ClocksStruct clocksStruct;
 static void setDateLabel(Widget date, DigitStruct *digits);
 void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
 
-Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w, Widget *value) ;
+Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) ;
 /*---------------------------*/
 /* App Resources definitions */
 /*---------------------------*/
@@ -348,7 +348,7 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 		unsigned char bg_b =  bg_color        & 0xFF;
 		attributes.visual = DefaultVisual ( XtDisplay(moon), DefaultScreen ( XtDisplay(moon) ) );
 		attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
-		pix = loadPixmapFromPngFile(pixmapFile, &status, moon, &moon);
+		pix = loadPixmapFromPngFile(pixmapFile, &status, moon);
 
 		XtVaSetValues(moon,
 					 XmNlabelType, XmPIXMAP,
@@ -549,14 +549,13 @@ void loadFonts(Display *display, ClocksStruct * clocks_struct) {
 	dumpFontList(display, fontList);
 }
 
-Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w, Widget *value) {
+Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 
 	printf("Open file %s\n", pngFile);
 	// Open PNG file
 	FILE *fp = fopen(pngFile, "rb");
 	if (!fp) {
 		fprintf(stderr, "Error opening file\n");
-		*value = w;
 		return 0;
 	}
 
@@ -579,17 +578,21 @@ Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w, Widget *value
 
 	// Initialize libpng
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (!png_ptr) { fclose(fp); *value = w;
-		return 0; }
+	if (!png_ptr) {
+		fclose(fp);
+		return 0;
+	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (!info_ptr) { png_destroy_read_struct(&png_ptr, NULL, NULL); fclose(fp); *value = w;
-		return 0; }
+	if (!info_ptr) {
+		png_destroy_read_struct(&png_ptr, NULL, NULL);
+		fclose(fp);
+		return 0;
+	}
 
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(fp);
-		*value = w;
 		return 0;
 	}
 
@@ -688,10 +691,9 @@ Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
 	XtSetArg( args[1], XmNy, y );
 	Widget w = XtCreateManagedWidget("moonPhase", xmPushButtonWidgetClass, parent, args, 2);
 
-	Widget value;
-	pix = loadPixmapFromPngFile(pngFile, &status, w, &value);
+	pix = loadPixmapFromPngFile(pngFile, &status, w);
 	if (status!=XpmSuccess) {
-		return value;
+		return w;
 	}
 
 	// set pixmap in widget
