@@ -10,7 +10,22 @@
 #include <math.h>
 #include <string.h>
 
-// calculates julian date for 12:00 UTC of a day
+/**
+ * calculates julian day of month
+ * See https://squarewidget.com/julian-day/
+ * @param d date to use
+ * @return julian day
+ */
+double dayOfMonth(DigitStruct *d) {
+    return (double)d->day + (double)d->h/24.0; //+ (double)d->m/1440.0;
+}
+
+/**
+ * calculates julian date of a day
+ * See https://squarewidget.com/julian-day/
+ * @param d date to use
+ * @return julian date, down to hours (minutes and smaller values are ignored)
+ */
 double julianDate(DigitStruct *d) {
     int y = d->year;
     int m = d->month;
@@ -24,9 +39,10 @@ double julianDate(DigitStruct *d) {
     double a = floor((double)y / 100.0);
     double b = 2.0 - a + floor(a / 4.0);
 
-    double jd = floor(365.25 * (double)(y + 4716)) + floor(30.6001 * (double)(m + 1)) + (double)d->day + b - 1524.5;
+    double jd = floor(365.25 * (double)(y + 4716)) + floor(30.6001 * (double)(m + 1)) + dayOfMonth(d) + b - 1524.5;
     return jd;
 }
+
 
 // Normalize angle to 0-30 degree and convert to rad
 double toRad(double deg) {
@@ -37,18 +53,23 @@ double toRad(double deg) {
     return deg * M_PI / 180.0;
 }
 
-// Calculates moon age in days (0 bis 29.53059), based on Jean Meeus formula
+/**
+ * Calculates moon age in days (0 bis 29.53059), based on Jean Meeus formula.
+ * See e.g. here: https://www.hcgreier.at/ephempedia/doku.php?id=mondphasen
+ * @param d date struct
+ * @return julian date value
+ */
 double moonAge(DigitStruct *d) {
     double jd = julianDate(d);
 
-    // T = Julianische Jahrhunderte seit J2000.0
+    // number of Julian centuries since Jan 1, 2000, 12 UT - T = Julianische Jahrhunderte seit J2000.0
     double T = (jd - 2451545.0) / 36525.0;
 
-    // 1. Mittlere Elongation des Mondes (D) in Grad
+    // 1. length of moon knot - Mittlere Elongation des Mondes (D) in Grad - Länge des mond knotes
     double D = 297.8501921 + 445267.1114034 * T - 0.0018819 * T * T + (T * T * T) / 545868.0 - (T * T * T * T) / 113065000.0;
-    // 2. Mittlere Anomalie der Sonne (M) in Grad
+    // 2. mean anomaly of sun - degree Mittlere Anomalie der Sonne (M) in Grad
     double M = 357.5291092 + 35999.0502909 * T - 0.0001536 * T * T + (T * T * T) / 24490000.0;
-    // 3. Mittlere Anomalie des Mondes (M') in Grad
+    // 3. mean anomaly of moon - Mittlere Anomalie des Mondes (M') in Grad
     double MPrime = 134.9633964 + 477198.8675055 * T + 0.0087414 * T * T + (T * T * T) / 69699.0 - (T * T * T * T) / 14712000.0;
 
     double dRad = toRad(D);
@@ -116,7 +137,7 @@ char *pngFiles[] = {
     "moons/moon-2-waxgib.png",  /* zunehmender Dreiviertelmond */
     "moons/moon-3-1st-q.png",   /* Erstes Viertel */
     "moons/moon-4-waxcres.png", /* Zunehmender Sichelmond */
-    "moons/moon-5-new.png",     /* Neumomd */
+    "moons/moon-5-new.png",     /* Neumond */
     "moons/moon-6-wancres.png", /* Abnehmender Sichelmond */
     "moons/moon-7-last-q.png",  /* Letztes Viertel */
     "moons/moon-8-wangib.png",  /* Abnehmender 3/4 Mond */

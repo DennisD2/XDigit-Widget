@@ -187,8 +187,8 @@ static void getCurrentTime(DigitStruct *digits, String zone) {
 	digits->m = tt->tm_min;
 	digits->s = tt->tm_sec;
 	digits->day = tt->tm_mday;
-	digits->month = tt->tm_mon;
-	digits->year = tt->tm_year +1900L;
+	digits->month = tt->tm_mon + 1; // tt is range 0-11
+	digits->year = tt->tm_year + 1900L; // tt has offset -1900
 
 	digits->offsetToLocal += tt->tm_hour;;
 	//printf("h:m:s = %d:%d:%d, gmtOffset=%d\n", digits->h, digits->m, digits->s, digits->gmtOffset);
@@ -225,8 +225,10 @@ static void setClockValue(ClocksStruct *allClocks, const ClockStruct *clock) {
 	}
 
 	setDateLabel( clock->dateWidget, &digits);
-	setMoonPhasePixmap(allClocks, allClocks->moonPhaseWidget, &digits);
 
+	if (clock == &(allClocks->clocks[0])) {
+		setMoonPhasePixmap(allClocks, allClocks->moonPhaseWidget, &digits);
+	}
 	// Optimize timeout value to match as good as possible the zero crossing of seconds value
 	// Not required if we have timeout every second:
 	if (theResources.showSeconds)
