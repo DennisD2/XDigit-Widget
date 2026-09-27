@@ -101,9 +101,8 @@ static ClocksStruct clocksStruct;
 static void setDateLabel(Widget date, DigitStruct *digits);
 void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
 
-Pixmap loadPixmapFromPngFile(char *pngFile, XpmAttributes attributes, Pixmap mask,
+Pixmap loadPixmapFromPngFile(char *pngFile, Pixmap mask,
 	int *status, Widget w,
-	unsigned char bg_r, unsigned char bg_g, unsigned char bg_b,
 	Widget *value) ;
 /*---------------------------*/
 /* App Resources definitions */
@@ -351,8 +350,8 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 		unsigned char bg_b =  bg_color        & 0xFF;
 		attributes.visual = DefaultVisual ( XtDisplay(moon), DefaultScreen ( XtDisplay(moon) ) );
 		attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
-		pix = loadPixmapFromPngFile(pixmapFile, attributes, mask, &status, moon,
-			bg_r, bg_g,bg_b, &moon);
+		pix = loadPixmapFromPngFile(pixmapFile, mask, &status, moon,
+			&moon);
 
 		XtVaSetValues(moon,
 					 XmNlabelType, XmPIXMAP,
@@ -553,9 +552,8 @@ void loadFonts(Display *display, ClocksStruct * clocks_struct) {
 	dumpFontList(display, fontList);
 }
 
-Pixmap loadPixmapFromPngFile(char *pngFile, XpmAttributes attributes, Pixmap mask,
+Pixmap loadPixmapFromPngFile(char *pngFile, Pixmap mask,
 	int *status, Widget w,
-	unsigned char bg_r, unsigned char bg_g, unsigned char bg_b,
 	Widget *value) {
 
 	printf("Open file %s\n", pngFile);
@@ -568,6 +566,21 @@ Pixmap loadPixmapFromPngFile(char *pngFile, XpmAttributes attributes, Pixmap mas
 	}
 
 	Display *dpy = XtDisplay(w);
+
+	// set up attributes struct
+	XpmAttributes   attributes;
+	Pixel bg_color;
+	XtVaGetValues ( w,
+					XmNdepth,    &attributes.depth,
+					XmNcolormap, &attributes.colormap,
+					XmNbackground, &bg_color,
+					NULL);
+	unsigned char bg_r = (bg_color >> 16) & 0xFF;
+	unsigned char bg_g = (bg_color >> 8)  & 0xFF;
+	unsigned char bg_b =  bg_color        & 0xFF;
+	attributes.visual = DefaultVisual ( dpy, DefaultScreen ( dpy ) );
+	attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
+
 	// Initialize libpng
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr) { fclose(fp); *value = w;
@@ -668,33 +681,18 @@ Pixmap loadPixmapFromPngFile(char *pngFile, XpmAttributes attributes, Pixmap mas
 
 Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
 
-	XpmAttributes   attributes;
-	Pixel bg_color;
 	Pixmap pix = None;
 	Pixmap mask = None;
 	Display *dpy = XtDisplay(parent);
 	int status;
+	Widget value;
 
 	Arg args[2];
 	XtSetArg( args[0], XmNx, x );
 	XtSetArg( args[1], XmNy, y );
 	Widget w = XtCreateManagedWidget("moonPhase", xmPushButtonWidgetClass, parent, args, 2);
 
-	XtVaGetValues ( w,
-	                XmNdepth,    &attributes.depth,
-	                XmNcolormap, &attributes.colormap,
-	                XmNbackground, &bg_color,
-	                NULL);
-	unsigned char bg_r = (bg_color >> 16) & 0xFF;
-	unsigned char bg_g = (bg_color >> 8)  & 0xFF;
-	unsigned char bg_b =  bg_color        & 0xFF;
-	/*
-	 * Specify the visual to be used and set the XpmAttributes mask.
-	 */
-	attributes.visual = DefaultVisual ( dpy, DefaultScreen ( dpy ) );
-	attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
-	Widget value;
-	pix = loadPixmapFromPngFile(pngFile, attributes, mask, &status, w, bg_r, bg_g, bg_b, &value);
+	pix = loadPixmapFromPngFile(pngFile, mask, &status, w, &value);
 	if (status!=XpmSuccess) {
 		return value;
 	}
