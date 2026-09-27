@@ -101,6 +101,10 @@ static ClocksStruct clocksStruct;
 static void setDateLabel(Widget date, DigitStruct *digits);
 void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
 
+Pixmap loadPixmapFromPngFile(char *pngFile, XpmAttributes attributes, Pixmap mask,
+	Display *dpy, int *status, Widget w,
+	unsigned char bg_r, unsigned char bg_g, unsigned char bg_b,
+	Widget *value) ;
 /*---------------------------*/
 /* App Resources definitions */
 /*---------------------------*/
@@ -317,7 +321,7 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 		XtSetArg( wargs[n], XtNwidth, &width ); n++;
 		XtGetValues( compo, wargs, n );
 
-		char *pngFile = "moon.png";
+		char *pngFile = "questionmark.png";
 		int xpos = (Position)width - MOON_WIDTH - 12;
 		int ypos = (Position)numClock*clocksStruct.digitHeight /*+ clocksStruct.digitHeight/2 - clocksStruct.label_y_offset*/;
 		*moonPhaseWidget = createMoonPhaseWidgets(compo, pngFile, xpos, ypos);
@@ -325,11 +329,35 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 }
 
 void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) {
+	char *pixmapFile = "questionmark.png";
 	double age = moonAge(d);
 	if (age != allClocks->moonAge) {
 		allClocks->moonAge = age;
 		moonAgeToPhase(age);
-		char *pixmapFile = moonAgeToPixmapName(age);
+		pixmapFile = moonAgeToPixmapName(age);
+		printf("pixmap file name: %s\n", pixmapFile);
+		int status;
+		XpmAttributes attributes;
+		Pixmap pix = None;
+		Pixmap mask = None;
+		Pixel bg_color;
+		XtVaGetValues ( moon,
+				XmNdepth,    &attributes.depth,
+				XmNcolormap, &attributes.colormap,
+				XmNbackground, &bg_color,
+				NULL);
+		unsigned char bg_r = (bg_color >> 16) & 0xFF;
+		unsigned char bg_g = (bg_color >> 8)  & 0xFF;
+		unsigned char bg_b =  bg_color        & 0xFF;
+		attributes.visual = DefaultVisual ( XtDisplay(moon), DefaultScreen ( XtDisplay(moon) ) );
+		attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
+		pix = loadPixmapFromPngFile(pixmapFile, attributes, mask, XtDisplay(moon), &status, moon,
+			bg_r, bg_g,bg_b, &moon);
+
+		XtVaSetValues(moon,
+					 XmNlabelType, XmPIXMAP,
+					 XmNlabelPixmap, pix,
+					 NULL);
 	}
 }
 
