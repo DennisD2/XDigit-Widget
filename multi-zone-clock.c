@@ -101,9 +101,7 @@ static ClocksStruct clocksStruct;
 static void setDateLabel(Widget date, DigitStruct *digits);
 void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
 
-Pixmap loadPixmapFromPngFile(char *pngFile, Pixmap mask,
-	int *status, Widget w,
-	Widget *value) ;
+Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w, Widget *value) ;
 /*---------------------------*/
 /* App Resources definitions */
 /*---------------------------*/
@@ -350,8 +348,7 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 		unsigned char bg_b =  bg_color        & 0xFF;
 		attributes.visual = DefaultVisual ( XtDisplay(moon), DefaultScreen ( XtDisplay(moon) ) );
 		attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
-		pix = loadPixmapFromPngFile(pixmapFile, mask, &status, moon,
-			&moon);
+		pix = loadPixmapFromPngFile(pixmapFile, &status, moon, &moon);
 
 		XtVaSetValues(moon,
 					 XmNlabelType, XmPIXMAP,
@@ -552,9 +549,7 @@ void loadFonts(Display *display, ClocksStruct * clocks_struct) {
 	dumpFontList(display, fontList);
 }
 
-Pixmap loadPixmapFromPngFile(char *pngFile, Pixmap mask,
-	int *status, Widget w,
-	Widget *value) {
+Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w, Widget *value) {
 
 	printf("Open file %s\n", pngFile);
 	// Open PNG file
@@ -580,6 +575,7 @@ Pixmap loadPixmapFromPngFile(char *pngFile, Pixmap mask,
 	unsigned char bg_b =  bg_color        & 0xFF;
 	attributes.visual = DefaultVisual ( dpy, DefaultScreen ( dpy ) );
 	attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
+	Pixmap mask = None;
 
 	// Initialize libpng
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -682,17 +678,18 @@ Pixmap loadPixmapFromPngFile(char *pngFile, Pixmap mask,
 Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
 
 	Pixmap pix = None;
-	Pixmap mask = None;
+
 	Display *dpy = XtDisplay(parent);
 	int status;
-	Widget value;
+
 
 	Arg args[2];
 	XtSetArg( args[0], XmNx, x );
 	XtSetArg( args[1], XmNy, y );
 	Widget w = XtCreateManagedWidget("moonPhase", xmPushButtonWidgetClass, parent, args, 2);
 
-	pix = loadPixmapFromPngFile(pngFile, mask, &status, w, &value);
+	Widget value;
+	pix = loadPixmapFromPngFile(pngFile, &status, w, &value);
 	if (status!=XpmSuccess) {
 		return value;
 	}
