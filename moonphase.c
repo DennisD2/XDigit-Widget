@@ -1,3 +1,6 @@
+/**
+ * Calculate moon age and moon age helper functions
+ */
 
 #include "multi-zone-clock.h"
 #include "moonphase.h"
@@ -6,7 +9,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-// Berechnet das Julianische Datum für den Mittag (12:00 UTC) des Tages
+// calculates julian date for 12:00 UTC of a day
 double julianDate(DigitStruct *d) {
     int y = d->year;
     int m = d->month;
@@ -16,7 +19,7 @@ double julianDate(DigitStruct *d) {
         m += 12;
     }
 
-    // Korrektur für den Gregorianischen Kalender ab Oktober 1582
+    // Fix for gregorian calendar since october 1582
     double a = floor((double)y / 100.0);
     double b = 2.0 - a + floor(a / 4.0);
 
@@ -24,7 +27,7 @@ double julianDate(DigitStruct *d) {
     return jd;
 }
 
-// Hilfsfunktion: Normalisiert Winkel auf 0-360 Grad und konvertiert in Bogenmaß (Rad)
+// Normalize angle to 0-30 degree and convert to rad
 double toRad(double deg) {
     deg = fmod(deg, 360.0);
     if (deg < 0) {
@@ -33,7 +36,7 @@ double toRad(double deg) {
     return deg * M_PI / 180.0;
 }
 
-// Berechnet das präzise Mondalter in Tagen (0 bis 29.53059) nach Jean Meeus
+// Calculates moon age in days (0 bis 29.53059), based on Jean Meeus formula
 double moonAge(DigitStruct *d) {
     double jd = julianDate(d);
 
@@ -71,6 +74,10 @@ double moonAge(DigitStruct *d) {
     return ageInDays;
 }
 
+/**
+ * Prints a string with (german) moon phase names depending on parameter moon age
+ * @param age moon age
+ */
 void moonAgeToPhase(double age) {
     if (age < 1.5 || age > 28.0) {
         printf("Phase: Neumond 🌑\n");
@@ -91,6 +98,7 @@ void moonAgeToPhase(double age) {
     }
 }
 
+// Array defining which PNG file to be used for what moon phase
 // waning=abnehmend , waxing=zunehmend
 // Crescent=Sichel, Gibbous=Dreiviertelmond
 // related to light part of moon
@@ -106,6 +114,11 @@ char *pngFiles[] = {
     "moon-8-wangib.png",  /* Abnehmender 3/4 Mond */
 };
 
+/**
+ * Calculates PNG file name depending on moon age parameter
+ * @param age moon age
+ * @return PNG file name from array pngFile[]
+ */
 char *moonAgeToPixmapName(double age) {
     int i=0;
     if (age < 1.5 || age > 28.0) {
@@ -128,6 +141,7 @@ char *moonAgeToPixmapName(double age) {
     return pngFiles[i];
 }
 
+// old main function, left here for testing purposes. Not used by the code.
 int test_main(int argc, char *argv[]) {
     // 1. Prüfen, ob ein Argument übergeben wurde
     if (argc < 2) {

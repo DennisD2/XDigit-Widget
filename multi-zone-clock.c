@@ -99,9 +99,10 @@ typedef struct {
 static ClocksStruct clocksStruct;
 
 static void setDateLabel(Widget date, DigitStruct *digits);
-void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
+Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y);
+static void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *digits);
+static Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) ;
 
-Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) ;
 /*---------------------------*/
 /* App Resources definitions */
 /*---------------------------*/
@@ -138,14 +139,12 @@ static XtResource resourceSpec[] = {
 	XtRString, "XtDefaultFont"},
 };
 
-Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y);
-
 /*---------------------------*/
 /* App functions             */
 /*---------------------------*/
 
 // Set timeout value either to default or a new value
-void setTimeoutValue(int newValue) {
+static void setTimeoutValue(int newValue) {
 	if (newValue == TIMEOUT_DEFAULT) {
 		if (theResources.showSeconds) {
 			clocksStruct.timeout = TIMEOUT_WITH_SECONDS;
@@ -325,17 +324,24 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 	}
 }
 
+/**
+ * Load and set pixmap for moonphase widget based on moon age / current date
+ * @param allClocks clocks structure to use
+ * @param moon widget for dsplaying moon phase pixmaps
+ * @param d date to be used to calculate moon age
+ */
 void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) {
-	char *pixmapFile = "questionmark.png";
 	double age = moonAge(d);
 	if (age != allClocks->moonAge) {
+		// moon age has changed
 		allClocks->moonAge = age;
 		moonAgeToPhase(age);
-		pixmapFile = moonAgeToPixmapName(age);
-		printf("pixmap file name: %s\n", pixmapFile);
+		//printf("pixmap file name: %s\n", pixmapFile);
 
-		int status;
+		// calculate file name based on moon age
+		char *pixmapFile = moonAgeToPixmapName(age);
 		// load pixmap from png file
+		int status;
 		Pixmap pix = loadPixmapFromPngFile(pixmapFile, &status, moon);
 		// set pixmap in moonphase widget
 		XtVaSetValues(moon,
@@ -537,55 +543,62 @@ void loadFonts(Display *display, ClocksStruct * clocks_struct) {
 	dumpFontList(display, fontList);
 }
 
+/**
+ *
+ * @param pngFile Name of PNG file to load
+ * @param status pointer to integer, will contain status after call
+ * @param w widget for that the pixmap is being loaded. Needed to set background/transparency.
+ * @return status==XpmSuccess on success. Then, return value is a valid pixmap.
+ */
 Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 
 	printf("Open file %s\n", pngFile);
 	// Open PNG file
 	FILE *fp = fopen(pngFile, "rb");
 	if (!fp) {
-		fprintf(stderr, "Error opening file\n");
-		return 0;
+		fprintf(stderr, "Error opening file %s\n", pngFile);
+		return None;
 	}
 
-	Display *dpy = XtDisplay(w);
-
 	// set up attributes struct
-	XpmAttributes   attributes;
+	Display *dpy = XtDisplay(w);
+	XpmAttributes attributes;
 	Pixel bg_color;
 	XtVaGetValues ( w,
 					XmNdepth,    &attributes.depth,
 					XmNcolormap, &attributes.colormap,
 					XmNbackground, &bg_color,
 					NULL);
+	attributes.visual = DefaultVisual ( dpy, DefaultScreen ( dpy ) );
+	attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
+	// get background R,G,B values
 	unsigned char bg_r = (bg_color >> 16) & 0xFF;
 	unsigned char bg_g = (bg_color >> 8)  & 0xFF;
 	unsigned char bg_b =  bg_color        & 0xFF;
-	attributes.visual = DefaultVisual ( dpy, DefaultScreen ( dpy ) );
-	attributes.valuemask = XpmDepth | XpmColormap | XpmVisual;
-	Pixmap mask = None;
 
 	// Initialize libpng
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr) {
 		fclose(fp);
-		return 0;
+		return None;
 	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) {
 		png_destroy_read_struct(&png_ptr, NULL, NULL);
 		fclose(fp);
-		return 0;
+		return None;
 	}
 
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(fp);
-		return 0;
+		return None;
 	}
 
 	png_init_io(png_ptr, fp);
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, NULL);
+	fclose(fp);
 
 	int width = png_get_image_width(png_ptr, info_ptr);
 	int height = png_get_image_height(png_ptr, info_ptr);
@@ -597,7 +610,7 @@ Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 	int xpm_lines = 1 + num_colors + height;
 	char **xpm_data = malloc(xpm_lines * sizeof(char *));
 
-	int tokenSize = 4;
+	int tokenSize = 4; // 4 is enough for smaller icons
 	// write header line
 	xpm_data[0] = malloc(50);
 	sprintf(xpm_data[0], "%d %d %d %d", width, height, num_colors, tokenSize);
@@ -615,7 +628,7 @@ Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 			unsigned char b = px[2];
 
 			// create char token for xpm
-			char token[10];
+			char token[6];
 			if (tokenSize == 5) {
 				sprintf(token, "%c%c%c%c%c",
 				        'a' + (color_index / 456976) % 26,
@@ -653,7 +666,8 @@ Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 
 	// create Pixmap from data
 	Pixmap pix;
-	*status = XpmCreatePixmapFromData(dpy, DefaultRootWindow ( dpy ),
+	Pixmap mask = None;
+	*status = XpmCreatePixmapFromData(dpy, DefaultRootWindow(dpy),
 	                                  xpm_data, &pix, &mask, &attributes);
 
 	// cleanup
@@ -662,29 +676,23 @@ Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 	}
 	free(xpm_data);
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-	fclose(fp);
+
 	return pix;
 }
 
 Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
-
-	Pixmap pix = None;
-
-	Display *dpy = XtDisplay(parent);
-	int status;
-
-
 	Arg args[2];
 	XtSetArg( args[0], XmNx, x );
 	XtSetArg( args[1], XmNy, y );
 	Widget w = XtCreateManagedWidget("moonPhase", xmPushButtonWidgetClass, parent, args, 2);
 
-	pix = loadPixmapFromPngFile(pngFile, &status, w);
-	if (status!=XpmSuccess) {
+	int status;
+	Pixmap pix = loadPixmapFromPngFile(pngFile, &status, w);
+	if (status != XpmSuccess) {
 		return w;
 	}
 
-	// set pixmap in widget
+	// set pixmap for widget
     if (status == XpmSuccess && pix != None) {
         XtVaSetValues(w,
                       XmNlabelType, XmPIXMAP,
@@ -692,7 +700,7 @@ Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
                       NULL);
 
     } else {
-        fprintf(stderr, "XPM-Fehler: Pixmap konnte nicht erstellt werden (%d).\n", status);
+        fprintf(stderr, "XPM error cannot create pixmap (status code: %d).\n", status);
     }
     return w;
 }
