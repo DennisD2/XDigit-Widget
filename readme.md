@@ -100,6 +100,25 @@ Example result:
 
 ![multi-zone-clock-resources.png](doc/multi-zone-clock-resources.png)
 
+## Moon phase display
+There is experimental code for displaying the moon phases.
+Therefore, directory [moons](./moons) was added, with a set of 8 moon
+images in PNG format. Tzhere is also a questionmark image. 
+The images have size 50x50 pixel.
+
+A file [moonphase.c](./moonphase.c) contains code that implements
+Jean Meeus formula for calculation moon age. That value is then
+used to determine the image to display. Code was added to load a PNG
+file, using libpng, and to convert it into a X Pixmap. 
+
+This whole extension is based heavily on input by Gemini AI Pro.
+
+![multi-zone-clock-moonphase.png](doc/multi-zone-clock-moonphase.png)
+
+The code has flaws, being not I18N correct. It displays some text in
+english, other in german. It would be good to move all these texts into
+resource file [Multi-zone-clock.ad](./Multi-zone-clock.ad).
+
 ## Install Motif libs+includes (OpenSuse)
 Using default OpenSuse packaging tooling, the following libs are needed for OSF/Motif:
 
