@@ -692,6 +692,7 @@ void moonButtonCallback(Widget w, XtPointer client_data, XtPointer call_data) {
 	Widget dialog = XmCreateMessageDialog(w, "phaseInfo", args, 1);
 	XtManageChild(dialog);
 	XmStringFree(xmstr);
+	// unmanage unneeded buttons
 	XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_CANCEL_BUTTON));
 	XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
 }
