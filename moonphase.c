@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 // calculates julian date for 12:00 UTC of a day
 double julianDate(DigitStruct *d) {
@@ -75,27 +76,34 @@ double moonAge(DigitStruct *d) {
 }
 
 /**
- * Prints a string with (german) moon phase names depending on parameter moon age
+ * returns a string with (german) moon phase names depending on parameter moon age
+ * The string is allocated with malloc(). So caller has to free it.
  * @param age moon age
  */
 char *moonAgeToPhase(double age) {
+    char *ret;
+    char retBuf[64];
     if (age < 1.5 || age > 28.0) {
-        return("Phase: Neumond");
+        ret = "Neumond";
     } else if (age >= 1.5 && age < 6.0) {
-        return("Phase: Erstes Viertel (Zunehmend)");
+        ret = "Erstes Viertel (Zunehmend)";
     } else if (age >= 6.0 && age < 9.0) {
-        return("Phase: Zunehmender Halbmond");
+        ret = "Zunehmender Halbmond";
     } else if (age >= 9.0 && age < 13.5) {
-        return("Phase: Zunehmender Dreiviertelmond");
+        ret = "Zunehmender Dreiviertelmond";
     } else if (age >= 13.5 && age < 16.0) {
-        return("Phase: Vollmond");
+        ret = "Vollmond";
     } else if (age >= 16.0 && age < 20.5) {
-        return("Phase: Abnehmender Dreiviertelmond");
+        ret = "Abnehmender Dreiviertelmond";
     } else if (age >= 20.5 && age < 23.5) {
-        return("Phase: Abnehmender Halbmond");
+        ret = "Abnehmender Halbmond";
     } else {
-        return("Phase: Letztes Viertel (Abnehmend)");
+        ret = "Letztes Viertel (Abnehmend)";
     }
+    sprintf(retBuf, "%s, moon age=%f", ret, age);
+    ret = malloc(strlen(retBuf) + 1);
+    strcpy(ret, retBuf);
+    return ret;
 }
 
 // Array defining which PNG file to be used for what moon phase

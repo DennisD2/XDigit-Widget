@@ -684,12 +684,14 @@ Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 void moonButtonCallback(Widget w, XtPointer client_data, XtPointer call_data) {
 	ClocksStruct *clocks = (ClocksStruct *)client_data;
 	char *ageInfo = moonAgeToPhase(clocks->moonAge);
-	printf("Moon age %f, info: %s\n", clocks->moonAge, ageInfo);
+	printf("%s\n", ageInfo);
 	XmString xmstr = XmStringCreate(ageInfo, XmSTRING_DEFAULT_CHARSET);
+	free(ageInfo);
 	Arg args[2];
 	XtSetArg( args[0], XmNmessageString, xmstr );
 	Widget dialog = XmCreateMessageDialog(w, "phaseInfo", args, 1);
 	XtManageChild(dialog);
+	XmStringFree(xmstr);
 	XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_CANCEL_BUTTON));
 	XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
 }
