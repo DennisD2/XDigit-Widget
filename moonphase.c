@@ -78,23 +78,23 @@ double moonAge(DigitStruct *d) {
  * Prints a string with (german) moon phase names depending on parameter moon age
  * @param age moon age
  */
-void moonAgeToPhase(double age) {
+char *moonAgeToPhase(double age) {
     if (age < 1.5 || age > 28.0) {
-        printf("Phase: Neumond 🌑\n");
+        return("Phase: Neumond");
     } else if (age >= 1.5 && age < 6.0) {
-        printf("Phase: Erstes Viertel (Zunehmend) 🌒\n");
+        return("Phase: Erstes Viertel (Zunehmend)");
     } else if (age >= 6.0 && age < 9.0) {
-        printf("Phase: Zunehmender Halbmond 🌓\n");
+        return("Phase: Zunehmender Halbmond");
     } else if (age >= 9.0 && age < 13.5) {
-        printf("Phase: Zunehmender Dreiviertelmond 🌔\n");
+        return("Phase: Zunehmender Dreiviertelmond");
     } else if (age >= 13.5 && age < 16.0) {
-        printf("Phase: Vollmond 🌕\n");
+        return("Phase: Vollmond");
     } else if (age >= 16.0 && age < 20.5) {
-        printf("Phase: Abnehmender Dreiviertelmond 🌖\n");
+        return("Phase: Abnehmender Dreiviertelmond");
     } else if (age >= 20.5 && age < 23.5) {
-        printf("Phase: Abnehmender Halbmond 🌗\n");
+        return("Phase: Abnehmender Halbmond");
     } else {
-        printf("Phase: Letztes Viertel (Abnehmend) 🌘\n");
+        return("Phase: Letztes Viertel (Abnehmend)");
     }
 }
 
@@ -168,6 +168,7 @@ int test_main(int argc, char *argv[]) {
 
     printf("Mondalter am %02d.%02d.%d: %.2f Tage\n", d.day, d.month, d.year, age);
 
-    moonAgeToPhase(age);
+    char *str = moonAgeToPhase(age);
+    printf("%s", str);
     return 0;
 }

@@ -12,6 +12,7 @@
 #include <Xm/Xm.h>
 #include <Xm/Label.h>
 #include <Xm/PushB.h>
+#include <Xm/MessageB.h>
 
 #include <X11/xpm.h>
 #include "png.h"
@@ -317,7 +318,7 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 		XtSetArg( wargs[n], XtNwidth, &width ); n++;
 		XtGetValues( compo, wargs, n );
 
-		char *pngFile = "questionmark.png";
+		char *pngFile = "moons/questionmark.png";
 		int xpos = (Position)width - MOON_WIDTH - 12;
 		int ypos = (Position)numClock*clocksStruct.digitHeight /*+ clocksStruct.digitHeight/2 - clocksStruct.label_y_offset*/;
 		*moonPhaseWidget = createMoonPhaseWidgets(compo, pngFile, xpos, ypos);
@@ -335,8 +336,8 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 	if (age != allClocks->moonAge) {
 		// moon age has changed
 		allClocks->moonAge = age;
-		moonAgeToPhase(age);
-		//printf("pixmap file name: %s\n", pixmapFile);
+		char *str = moonAgeToPhase(age);
+		printf("Moon age: %s\n", str);
 
 		// calculate file name based on moon age
 		char *pixmapFile = moonAgeToPixmapName(age);
@@ -680,15 +681,30 @@ Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 	return pix;
 }
 
+void moonButtonCallback(Widget w, XtPointer client_data, XtPointer call_data) {
+	ClocksStruct *clocks = (ClocksStruct *)client_data;
+	char *ageInfo = moonAgeToPhase(clocks->moonAge);
+	printf("Moon age %f, info: %s\n", clocks->moonAge, ageInfo);
+	XmString xmstr = XmStringCreate(ageInfo, XmSTRING_DEFAULT_CHARSET);
+	Arg args[2];
+	XtSetArg( args[0], XmNmessageString, xmstr );
+	Widget dialog = XmCreateMessageDialog(w, "phaseInfo", args, 1);
+	XtManageChild(dialog);
+	XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_CANCEL_BUTTON));
+	XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
+}
+
 Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
 	Arg args[2];
 	XtSetArg( args[0], XmNx, x );
 	XtSetArg( args[1], XmNy, y );
 	Widget w = XtCreateManagedWidget("moonPhase", xmPushButtonWidgetClass, parent, args, 2);
+	XtAddCallback(w, XmNactivateCallback, moonButtonCallback, &clocksStruct);
 
 	int status;
 	Pixmap pix = loadPixmapFromPngFile(pngFile, &status, w);
 	if (status != XpmSuccess) {
+		fprintf(stderr, "Error: loading pixmap %s with no success.", pngFile);
 		return w;
 	}
 
