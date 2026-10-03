@@ -22,4 +22,5 @@ multi-zone-clock.dateFont:  auto
 
 multi-zone-clock*phaseInfo_popop.font: -Adobe-Helvetica-Bold-R-Normal--24-240-75-75-P-138-ISO8859-1
 multi-zone-clock*phaseInfo_popup.fontList: -Adobe-Helvetica-Bold-R-Normal--24-240-75-75-P-138-ISO8859-1
+multi-zone-clock.moonFilesPath: /home/dennis/bin/moons
 

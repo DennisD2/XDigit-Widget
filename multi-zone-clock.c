@@ -115,6 +115,7 @@ typedef struct {
 	Boolean showSeconds;
 	XFontStruct *titleFont;
 	XFontStruct *dateFont;
+	String moonFilesPath;
 } Resources;
 
 static Resources theResources;
@@ -138,6 +139,9 @@ static XtResource resourceSpec[] = {
 	{ "dateFont", XtCFont, XtRFontStruct, sizeof(XFontStruct *),
 	XtOffsetOf(Resources, dateFont),
 	XtRString, "XtDefaultFont"},
+{ "moonFilesPath", "Path", XtRString, sizeof(String),
+	XtOffsetOf(Resources, moonFilesPath),
+	XtRString, "."},
 };
 
 /*---------------------------*/
@@ -348,7 +352,9 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 		if (strcmp(pixmapFile, oldPixmapFile) != 0) {
 			// load pixmap from png file, but only if we have to load a new file
 			int status;
-			Pixmap pix = loadPixmapFromPngFile(pixmapFile, &status, moon);
+			char pixmapFullPath[256];
+			sprintf(pixmapFullPath, "%s/%s", theResources.moonFilesPath, pixmapFile);
+			Pixmap pix = loadPixmapFromPngFile(pixmapFullPath, &status, moon);
 			// set pixmap in moonphase widget
 			XtVaSetValues(moon,
 						 XmNlabelType, XmPIXMAP,
@@ -749,6 +755,7 @@ int main(int argc, char **argv) {
 		printf("%d clocks defined\n", numClocks);
 	}
 	printf("showSeconds = %d\n", theResources.showSeconds);
+	printf("moonFilesPath = %s\n", theResources.moonFilesPath);
 
     clocksStruct.numClocks = numClocks;
     clocksStruct.clocks = malloc(sizeof(ClockStruct)*numClocks);
