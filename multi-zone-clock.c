@@ -355,12 +355,21 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 			char pixmapFullPath[256];
 			sprintf(pixmapFullPath, "%s/%s", theResources.moonFilesPath, pixmapFile);
 			Pixmap pix = loadPixmapFromPngFile(pixmapFullPath, &status, moon);
+
+			// Draw circle around moon image
+			GC gc = XCreateGC(XtDisplay(moon), XtWindow(moon), 0, NULL);
+			XSetForeground(XtDisplay(moon), gc,  0xffffff);
+			Dimension w,h;
+			XtVaGetValues(moon, XmNwidth, &w, XmNheight, &h, NULL);
+			XDrawArc(XtDisplay(moon), pix, gc, 0, 1, w-15,h-15, 0, 360*64 );
+
 			// set pixmap in moonphase widget
 			XtVaSetValues(moon,
 						 XmNlabelType, XmPIXMAP,
 						 XmNlabelPixmap, pix,
 						 NULL);
 		}
+
 	}
 }
 
