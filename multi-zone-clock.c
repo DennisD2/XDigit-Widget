@@ -324,7 +324,7 @@ static void createClockLabelWidgets(Widget compo, int numClock, char* title, Wid
 		XtSetArg( wargs[n], XtNwidth, &width ); n++;
 		XtGetValues( compo, wargs, n );
 
-		char *pngFile = "moons/questionmark.png";
+		char *pngFile = "questionmark.png";
 		int xpos = (Position)width - MOON_WIDTH - 12;
 		int ypos = (Position)numClock*clocksStruct.digitHeight /*+ clocksStruct.digitHeight/2 - clocksStruct.label_y_offset*/;
 		*moonPhaseWidget = createMoonPhaseWidgets(compo, pngFile, xpos, ypos);
@@ -726,7 +726,9 @@ Widget createMoonPhaseWidgets(Widget parent, char *pngFile, int x, int y) {
 	XtAddCallback(w, XmNactivateCallback, moonButtonCallback, &clocksStruct);
 
 	int status;
-	Pixmap pix = loadPixmapFromPngFile(pngFile, &status, w);
+	char pixmapFullPath[256];
+	sprintf(pixmapFullPath, "%s/%s", theResources.moonFilesPath, pngFile);
+	Pixmap pix = loadPixmapFromPngFile(pixmapFullPath, &status, w);
 	if (status != XpmSuccess) {
 		fprintf(stderr, "Error: loading pixmap %s with no success.", pngFile);
 		return w;
