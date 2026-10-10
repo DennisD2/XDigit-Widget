@@ -94,6 +94,7 @@ typedef struct {
 	XmFontList dateFontList;
 	Widget moonPhaseWidget;
 	double moonAge;
+	bool initMoonPhasePixmap;
 } ClocksStruct;
 
 // global static variable for all clocks
@@ -349,7 +350,8 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 
 		// calculate new file name based on moon age
 		char *pixmapFile = moonAgeToPixmapName(age);
-		if (strcmp(pixmapFile, oldPixmapFile) != 0) {
+		//printf("pixmap: %s, oldPixmapFile=%s, init=%d\n", pixmapFile, oldPixmapFile, allClocks->initMoonPhasePixmap);
+		if (allClocks->initMoonPhasePixmap || strcmp(pixmapFile, oldPixmapFile) != 0) {
 			// load pixmap from png file, but only if we have to load a new file
 			int status;
 			char pixmapFullPath[256];
@@ -368,6 +370,8 @@ void setMoonPhasePixmap(  ClocksStruct *allClocks, Widget moon, DigitStruct *d) 
 						 XmNlabelType, XmPIXMAP,
 						 XmNlabelPixmap, pix,
 						 NULL);
+			// initial display of valid pixmap is done
+			allClocks->initMoonPhasePixmap = false;
 		}
 
 	}
@@ -816,6 +820,8 @@ int main(int argc, char **argv) {
 	/*
      * Create all digit widgets and title+date widgets per clock
      */
+	// ensure initial display of valid pixmap for moon phase
+	clocksStruct.initMoonPhasePixmap = true;
 	for ( i=0; i<numClocks; i++ ) {
 		createClockLabelWidgets(compo,i, labels[i], &(clocksStruct.clocks[i].labelWidget),
 			&(clocksStruct.clocks[i].dateWidget),
