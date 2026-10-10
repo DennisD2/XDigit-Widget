@@ -709,7 +709,7 @@ Pixmap loadPixmapFromPngFile(char *pngFile, int *status, Widget w) {
 void moonButtonCallback(Widget w, XtPointer client_data, XtPointer call_data) {
 	ClocksStruct *clocks = (ClocksStruct *)client_data;
 	char *ageInfo = moonAgeToPhase(clocks->moonAge);
-	printf("%s\n", ageInfo);
+	printf("%s [0 .. 29,53]\n", ageInfo);
 	XmString xmstr = XmStringCreate(ageInfo, XmSTRING_DEFAULT_CHARSET);
 	free(ageInfo);
 	Arg args[2];
